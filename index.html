@@ -1,405 +1,1034 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sharvesh Subhash - Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-            overflow-x: hidden;
-        }
-        .orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        .section-title {
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
-        }
-        .project-card {
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(55, 65, 81, 0.5);
-            transition: all 0.3s ease;
-        }
-        .project-card:hover {
-            border-color: #00ffff;
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-        .modal-backdrop {
-            background: rgba(10, 10, 10, 0.9);
-            backdrop-filter: blur(15px);
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px; /* Added for horizontal scrollbar */
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-        }
-        .skill-tag {
-            background-color: #1f2937;
-            border: 1px solid #374151;
-            transition: all 0.2s ease-in-out;
-        }
-        .skill-tag:hover {
-            background-color: #00ffff;
-            color: #0a0a0a;
-            transform: scale(1.05);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sharvesh Subhash — Robotics Autonomy &amp; Perception</title>
+<meta name="description" content="Sharvesh Subhash — AI Systems M.Sc. @ NUS. Robotics autonomy, computer vision, self-supervised perception, and visual SLAM for marine & aerial systems." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root{
+    --bg:#07100f;
+    --bg-2:#0a1614;
+    --bg-3:#0d1c19;
+    --ink:#eaf2ee;
+    --muted:#8fa39c;
+    --muted-2:#5f726c;
+    --line:rgba(170,210,200,.10);
+    --line-strong:rgba(170,210,200,.20);
+    --surface:rgba(160,220,205,.035);
+    --accent:#6fe9c9;
+    --accent-dim:#3fa78f;
+    --warm:#ff8a6b;
+    --max:1240px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Hanken Grotesk',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    cursor:auto;
+  }
+  ::selection{background:var(--accent);color:#04100d}
+
+  /* ---------- background layers ---------- */
+  #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+  .bg-mesh{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60vw 60vw at 78% 8%, rgba(111,233,201,.10), transparent 60%),
+      radial-gradient(55vw 50vw at 12% 92%, rgba(255,138,107,.07), transparent 60%),
+      radial-gradient(80vw 70vw at 50% 50%, rgba(13,28,25,.55), transparent 70%);
+  }
+  .bg-grain{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scanline{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.35;
+    background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.16) 3px 4px);
+    mix-blend-mode:multiply;
+  }
+  .wrap{position:relative;z-index:2}
+
+  .container{max-width:var(--max);margin:0 auto;padding:0 28px}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:60;
+    transition:background .4s var(--ease),border-color .4s var(--ease),backdrop-filter .4s;
+    border-bottom:1px solid transparent;
+  }
+  nav.scrolled{
+    background:rgba(7,16,15,.7);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{max-width:var(--max);margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .mark{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.04em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:9px}
+  .mark .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:pulse 2.6s var(--ease) infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.02em;
+    color:var(--muted);text-decoration:none;position:relative;transition:color .25s;
+  }
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-5px;height:1px;width:0;background:var(--accent);transition:width .3s var(--ease)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{padding:8px 16px;border:1px solid var(--line-strong);border-radius:999px;color:var(--ink)!important}
+  .nav-cta:hover{border-color:var(--accent);background:rgba(111,233,201,.08)}
+  .burger{display:none;background:none;border:1px solid var(--line-strong);border-radius:8px;padding:8px;cursor:pointer}
+  .burger span{display:block;width:18px;height:2px;background:var(--ink);margin:3px 0;transition:.3s}
+  @media(max-width:860px){
+    .nav-links{position:fixed;inset:0 0 auto 0;top:0;flex-direction:column;background:rgba(7,16,15,.97);backdrop-filter:blur(18px);padding:90px 28px 30px;gap:22px;transform:translateY(-120%);transition:transform .45s var(--ease);height:100vh;justify-content:flex-start}
+    .nav-links.open{transform:translateY(0)}
+    .nav-links a{font-size:18px}
+    .burger{display:block;z-index:70}
+  }
+
+  /* ---------- hero ---------- */
+  header.hero{min-height:100svh;display:flex;align-items:center;position:relative;padding-top:90px}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;width:100%}
+  @media(max-width:980px){.hero-grid{grid-template-columns:1fr}}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent);opacity:.7}
+  h1.name{
+    font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+    font-size:clamp(2.9rem,8vw,6.3rem);line-height:.94;letter-spacing:-.02em;margin:22px 0 8px;
+  }
+  h1.name .l2{display:block;color:transparent;-webkit-text-stroke:1.3px var(--muted)}
+  .role-line{font-size:clamp(1.05rem,2.4vw,1.5rem);color:var(--ink);font-weight:500;min-height:1.6em}
+  .role-line .typed{color:var(--accent)}
+  .role-line .cursor{display:inline-block;width:2px;height:1.05em;background:var(--accent);margin-left:3px;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero-sub{color:var(--muted);max-width:46ch;margin-top:20px;font-size:1.02rem}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+  .btn{
+    font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.02em;
+    padding:13px 22px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;
+    transition:transform .25s var(--ease),background .25s,border-color .25s,color .25s;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--accent);color:#04100d;font-weight:500}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 34px rgba(111,233,201,.28)}
+  .btn-ghost{border-color:var(--line-strong);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-3px)}
+  .socials{display:flex;gap:16px;margin-top:30px}
+  .socials a{color:var(--muted);transition:color .25s,transform .25s}
+  .socials a:hover{color:var(--accent);transform:translateY(-3px)}
+  #hero-canvas-holder{height:460px;position:relative}
+  @media(max-width:980px){#hero-canvas-holder{height:320px;order:-1}}
+  .hud{position:absolute;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted-2);letter-spacing:.06em}
+  .hud.tl{top:6px;left:6px}.hud.br{bottom:6px;right:6px}
+  .hud b{color:var(--accent-dim)}
+
+  /* ---------- section scaffolding ---------- */
+  section{padding:100px 0;position:relative}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:54px;flex-wrap:wrap}
+  .sec-kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-dim)}
+  .sec-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(2rem,5vw,3.4rem);line-height:1;letter-spacing:-.02em;margin-top:12px}
+  .sec-note{color:var(--muted);max-width:42ch;font-size:.95rem}
+
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- about strip ---------- */
+  #about{padding-top:40px}
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:start}
+  @media(max-width:860px){.about-grid{grid-template-columns:1fr;gap:34px}}
+  .about-lead{font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:clamp(1.25rem,3vw,1.9rem);line-height:1.35;letter-spacing:-.01em}
+  .about-lead em{font-style:normal;color:var(--accent)}
+  .about-body{color:var(--muted);font-size:1rem}
+  .about-body p+p{margin-top:14px}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+  .stat{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--surface)}
+  .stat .n{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:2rem;color:var(--accent)}
+  .stat .l{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-top:2px}
+
+  /* ---------- experience ---------- */
+  .timeline{position:relative;margin-left:6px}
+  .timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:linear-gradient(var(--accent),transparent 92%);opacity:.45}
+  .exp{position:relative;padding:0 0 40px 42px}
+  .exp:last-child{padding-bottom:0}
+  .exp .node{position:absolute;left:0;top:6px;width:15px;height:15px;border-radius:50%;border:2px solid var(--bg);background:var(--accent-dim)}
+  .exp.now .node{background:var(--accent);box-shadow:0 0 0 5px rgba(111,233,201,.14),0 0 20px var(--accent)}
+  .exp .when{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.04em;color:var(--accent-dim)}
+  .exp .now-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#04100d;background:var(--accent);padding:1px 8px;border-radius:999px;margin-left:8px;text-transform:uppercase}
+  .exp h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.22rem;margin-top:6px}
+  .exp .org{color:var(--ink);font-weight:500;font-size:.98rem}
+  .exp .org span{color:var(--muted)}
+  .exp p.d{color:var(--muted);font-size:.93rem;margin-top:8px;max-width:64ch}
+
+  /* ---------- education ---------- */
+  .edu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:760px){.edu-grid{grid-template-columns:1fr}}
+  .edu{position:relative;border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--surface);overflow:hidden;transition:border-color .35s,transform .35s var(--ease)}
+  .edu::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--accent),transparent)}
+  .edu:hover{border-color:var(--accent);transform:translateY(-4px)}
+  .edu .ew{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;color:var(--accent-dim);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .edu .ew .badge{color:#04100d;background:var(--accent);padding:1px 9px;border-radius:999px;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em}
+  .edu h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.18rem;line-height:1.18;margin:12px 0 6px}
+  .edu .inst{color:var(--ink);font-weight:500;font-size:.95rem}
+  .edu .det{color:var(--muted);font-size:.86rem;margin-top:8px}
+
+  /* ---------- projects ---------- */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px}
+  .filter{
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);
+    cursor:pointer;transition:.25s;
+  }
+  .filter:hover{color:var(--ink);border-color:var(--line-strong)}
+  .filter.active{background:var(--accent);color:#04100d;border-color:var(--accent);font-weight:500}
+  .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:980px){.proj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.proj-grid{grid-template-columns:1fr}}
+  .card{
+    position:relative;border:1px solid var(--line);border-radius:16px;padding:24px 22px 22px;
+    background:var(--surface);cursor:pointer;overflow:hidden;
+    transition:transform .4s var(--ease),border-color .4s,background .4s;
+    display:flex;flex-direction:column;min-height:218px;
+  }
+  .card::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,rgba(111,233,201,.12),transparent 55%);opacity:0;transition:opacity .4s}
+  .card:hover{transform:translateY(-6px);border-color:var(--accent);background:rgba(111,233,201,.05)}
+  .card:hover::before{opacity:1}
+  .card .idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-2)}
+  .card .ct{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-dim);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+  .card .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.18rem;line-height:1.15;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:.9rem;flex:1}
+  .card .go{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);display:flex;align-items:center;gap:6px;opacity:.7;transition:gap .3s,opacity .3s}
+  .card:hover .go{opacity:1;gap:11px}
+  .card.hide{display:none}
+
+  /* ---------- publications ---------- */
+  .pub{
+    display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:start;
+    padding:26px 0;border-top:1px solid var(--line);transition:.3s;
+  }
+  .pub:last-child{border-bottom:1px solid var(--line)}
+  .pub:hover{background:linear-gradient(90deg,rgba(111,233,201,.045),transparent 70%)}
+  .pub .pn{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted-2);padding-top:4px}
+  .pub h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.18rem;line-height:1.25}
+  .pub .meta{color:var(--muted);font-size:.92rem;margin-top:8px;max-width:72ch}
+  .pub .venue{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-dim);margin-top:10px;letter-spacing:.02em}
+  .pill{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap;border:1px solid var(--line)}
+  .pill.review{color:var(--warm);border-color:rgba(255,138,107,.4)}
+  .pill.pub{color:var(--accent);border-color:rgba(111,233,201,.4)}
+  @media(max-width:760px){.pub{grid-template-columns:1fr;gap:8px}.pub .pn{display:none}}
+
+  /* ---------- honours + leadership ---------- */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+  @media(max-width:860px){.two-col{grid-template-columns:1fr;gap:44px}}
+  .award{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .award:last-child{border-bottom:none}
+  .award .rk{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent);min-width:62px;line-height:1}
+  .award .rk small{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted-2);letter-spacing:.06em;font-weight:400;margin-top:3px}
+  .award .at{font-weight:500}
+  .award .av{color:var(--muted);font-size:.88rem}
+  .lead-card{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface);margin-bottom:16px}
+  .lead-card h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.05rem}
+  .lead-card .lw{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-dim);margin-top:3px}
+  .lead-card p{color:var(--muted);font-size:.9rem;margin-top:8px}
+
+  /* ---------- skills ---------- */
+  .skill-block{margin-bottom:30px}
+  .skill-block .sb-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+  .skill-block .sb-label::after{content:"";flex:1;height:1px;background:var(--line)}
+  .tags{display:flex;flex-wrap:wrap;gap:9px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);transition:.2s}
+  .tag:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+  .tag.cert{border-style:dashed;border-color:rgba(255,138,107,.35);color:var(--warm)}
+  .tag.cert:hover{border-color:var(--warm);color:var(--warm)}
+
+  /* ---------- youtube ---------- */
+  .yt-rail{display:flex;gap:22px;overflow-x:auto;padding-bottom:18px;scroll-snap-type:x mandatory}
+  .yt-rail::-webkit-scrollbar{height:8px}
+  .yt-rail::-webkit-scrollbar-track{background:var(--bg-2)}
+  .yt-rail::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:8px}
+  .yt-card{flex:0 0 340px;scroll-snap-align:start;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);transition:.35s}
+  .yt-card:hover{border-color:var(--accent)}
+  .yt-card .frame{aspect-ratio:16/9;background:#000;position:relative;cursor:pointer;overflow:hidden}
+  .yt-card .frame img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease),opacity .3s;display:block}
+  .yt-card:hover .frame img{transform:scale(1.05)}
+  .yt-card .frame::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,16,14,.55))}
+  .yt-play{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center}
+  .yt-play span{width:58px;height:58px;border-radius:50%;background:rgba(7,16,15,.6);backdrop-filter:blur(4px);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;transition:.3s;box-shadow:0 0 0 0 rgba(111,233,201,.35)}
+  .yt-card:hover .yt-play span{background:var(--accent);box-shadow:0 0 28px rgba(111,233,201,.45)}
+  .yt-play svg{fill:var(--accent);transition:.3s;margin-left:3px}
+  .yt-card:hover .yt-play svg{fill:#04100d}
+  .yt-card iframe{width:100%;height:100%;border:0;display:block}
+  .yt-card .body{padding:16px 18px}
+  .yt-card h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1rem;line-height:1.2}
+  .yt-card p{color:var(--muted);font-size:.85rem;margin-top:7px}
+  @media(max-width:640px){.yt-card{flex-basis:280px}}
+
+  /* ---------- footer ---------- */
+  footer{padding:90px 0 50px;border-top:1px solid var(--line);position:relative}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:end}
+  @media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:30px}}
+  .foot-big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2rem,7vw,4.2rem);line-height:1;letter-spacing:-.02em}
+  .foot-big a{color:var(--accent);text-decoration:none;transition:.25s}
+  .foot-big a:hover{color:var(--ink)}
+  .contact-list{display:flex;flex-direction:column;gap:12px}
+  .contact-list a,.contact-list span{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);text-decoration:none;transition:.25s;display:flex;align-items:center;gap:10px}
+  .contact-list a:hover{color:var(--accent)}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:60px;padding-top:24px;border-top:1px solid var(--line);flex-wrap:wrap;gap:12px}
+  .foot-bottom p{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-2);letter-spacing:.03em}
+
+  /* ---------- modal ---------- */
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+  .modal.open{display:flex}
+  .modal-bg{position:absolute;inset:0;background:rgba(4,9,8,.82);backdrop-filter:blur(10px)}
+  .modal-card{
+    position:relative;width:100%;max-width:860px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,var(--bg-3),var(--bg-2));border:1px solid var(--line-strong);border-radius:20px;
+    box-shadow:0 40px 120px rgba(0,0,0,.6);transform:translateY(20px) scale(.98);opacity:0;transition:.4s var(--ease);
+  }
+  .modal.open .modal-card{transform:none;opacity:1}
+  .modal-viz{height:240px;background:radial-gradient(circle at 50% 50%,#0c1a17,#05100e);position:relative;border-bottom:1px solid var(--line)}
+  .modal-viz .vlabel{position:absolute;top:12px;left:16px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--accent-dim)}
+  .modal-body{padding:28px;overflow-y:auto}
+  .modal-body .mct{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+  .modal-body h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.7rem;line-height:1.1;margin:8px 0 14px}
+  .modal-body p.md{color:var(--muted);font-size:.97rem}
+  .modal-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .modal-tags .mt{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+  .modal-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+  .close-x{position:absolute;top:14px;right:14px;z-index:5;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-strong);background:rgba(7,16,15,.7);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.25s}
+  .close-x:hover{border-color:var(--warm);color:var(--warm);transform:rotate(90deg)}
+</style>
 </head>
-<body class="w-full">
-    <canvas id="bg-canvas"></canvas>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="bg-mesh"></div>
+<div class="bg-grain"></div>
+<div class="scanline"></div>
 
-    <div id="main-content">
-        <div id="content" class="relative z-10 container mx-auto px-4 md:px-8">
-            <header id="home" class="min-h-screen flex flex-col justify-center items-center text-center">
-                <div id="hero-animation" class="w-full h-64 md:h-96"></div>
-                <h1 class="orbitron text-4xl md:text-6xl font-bold mt-4 text-white">SHARVESH SUBHASH</h1>
-                <p class="text-lg md:text-2xl text-cyan-300 mt-2">AI & Machine Learning Researcher & Developer</p>
-                 <div class="mt-8 flex space-x-4">
-                     <a href="https://www.linkedin.com/in/sharveshsubhash/" target="_blank" class="text-cyan-400 hover:text-white transition duration-300">
-                         <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
-                     </a>
-                     <a href="https://github.com/SharveshS" target="_blank" class="text-cyan-400 hover:text-white transition duration-300">
-                         <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                     </a>
-                 </div>
-                 <a href="#projects" class="mt-12 animate-bounce">
-                     <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                 </a>
-            </header>
-
-            <section id="projects" class="py-24">
-                <h2 class="section-title orbitron text-3xl md:text-5xl font-bold text-center mb-12">Projects Showcase</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            </section>
-
-            <section id="youtube" class="py-24">
-                <h2 class="section-title orbitron text-3xl md:text-5xl font-bold text-center mb-12">
-                    From My YouTube Channel
-                </h2>
-                <div id="youtube-videos-container" class="flex overflow-x-auto space-x-8 pb-8 pl-4 md:pl-8">
-                    </div>
-            </section>
-
-            <section id="career" class="py-24">
-                <h2 class="section-title orbitron text-3xl md:text-5xl font-bold text-center mb-16">Career & Education</h2>
-                <div class="flex flex-col md:flex-row justify-center gap-16">
-                    <div class="w-full md:w-1/2">
-                        <h3 class="orbitron text-2xl font-semibold text-cyan-300 mb-8 text-center">Experience</h3>
-                        <div class="relative border-l-2 border-cyan-500/30 pl-8 space-y-12"></div>
-                    </div>
-                    <div class="w-full md:w-1/2">
-                        <h3 class="orbitron text-2xl font-semibold text-cyan-300 mb-8 text-center">Education</h3>
-                        <div class="relative border-l-2 border-cyan-500/30 pl-8 space-y-12"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="skills" class="py-24 text-center">
-                <h2 class="section-title orbitron text-3xl md:text-5xl font-bold mb-12">Technical Skills</h2>
-                <div class="flex flex-wrap justify-center gap-3"></div>
-            </section>
-
-            <footer class="text-center py-8 border-t border-gray-800">
-                <p>&copy; 2024 Sharvesh Subhash. All rights reserved.</p>
-                <p class="text-gray-500 text-sm mt-2">Built with Three.js & Tailwind CSS</p>
-            </footer>
-        </div>
-
-        <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-            <div class="modal-backdrop absolute inset-0"></div>
-            <div class="relative w-full max-w-4xl max-h-[90vh] bg-gray-900 border border-cyan-500/50 rounded-lg shadow-2xl flex flex-col">
-                <div id="modal-animation-container" class="w-full h-64 md:h-80 bg-black rounded-t-lg overflow-hidden"></div>
-                <div class="p-6 flex-grow overflow-y-auto">
-                    <h3 id="modal-title" class="orbitron text-2xl font-bold text-cyan-300"></h3>
-                    <p id="modal-description" class="mt-4 text-gray-300"></p>
-                    <div id="modal-links" class="mt-6 flex space-x-4"></div>
-                </div>
-                <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                </button>
-            </div>
-        </div>
+<div class="wrap">
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#home" class="mark"><span class="dot"></span>SHARVESH&nbsp;SUBHASH</a>
+      <button class="burger" id="burger" aria-label="menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="navlinks">
+        <a href="#about">/about</a>
+        <a href="#experience">/experience</a>
+        <a href="#education">/education</a>
+        <a href="#projects">/work</a>
+        <a href="#publications">/research</a>
+        <a href="#skills">/stack</a>
+        <a href="#contact" class="nav-cta">Get in touch</a>
+      </div>
     </div>
-    
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    
-        // --- Data from Resume ---
-        const projects = [
-            { id: 'driver-behavior', title: 'Driver Behavior Detection', description: 'Applied Transfer Learning using a Swin Transformer model to classify 10 distracted states of a driver, using the State Farm dataset.', github: 'https://github.com/SharveshSubhash/DashCam-Model-for-Driver-Behavior-Identification', animation: createDriverAnimation },
-            { id: 'indian-data-filter', title: 'Indian Data Filter Package', description: 'A Python package created for filtering Indian script-based data, developed during my tenure at IIT Madras SSB lab.', github: 'https://github.com/SharveshSubhash/IndianDataFilter', animation: createIndianDataFilterAnimation },
-            { id: 'ev-location', title: 'Optimal EV Station Location', description: 'Developed an RL framework and prediction module for site selection of new charging stations in New York and predicting port vacancy.', github: 'https://github.com/SharveshSubhash/Optimal_Location_And_Utilization_Prediction_NYC_Project', animation: createEVStationAnimation },
-            { id: 'defect-detection', title: 'Industrial Defect Detection', description: 'A computer vision project for manufacturing analytics using models like YOLO to identify defects in industrial components.', github: 'https://github.com/SharveshSubhash/Industrial_Surface_Defect_Detection_using_Computer_Vision_For_Manufacturing', animation: createDefectAnimation },
-            { id: 'object-captioning', title: 'Real-time Object Captioning', description: 'An internal project for prototype development to perform object detection, recognition, and voice-based captioning for real-time video.', github: 'https://github.com/SharveshSubhash/Real-Time-Video-based-Object-Detection-and-Speech-based-Video-Captioning', animation: createObjectCaptioningAnimation },
-            { id: 'virtual-assistant', title: 'Voice-Based Virtual Assistant', description: 'Fine-tuned the Llama2-7b model for chatbot use cases and saved the model in Hugging Face framework for further use.', github: 'https://github.com/SharveshSubhash/Voice-based-LLM-Chatbot-7b', animation: createVoiceAssistantAnimation },
-            { id: 'ner-bert', title: 'Name Entity Recognition with BERT', description: 'Pre-processed a dataset and fine-tuned a BERT transformer model for accuracy in classifying names and entities in sentences.', github: 'https://github.com/SharveshSubhash/Name-Entity-Recognition-NLP-task-using-BERT', animation: createNERAnimation },
-            { id: 'qa-bert', title: 'Question Answering with BERT', description: 'Preprocessed a dataset and fine-tuned a BERT transformer model for accuracy in the Question Answering task.', github: 'https://github.com/SharveshSubhash/Question-Answering-NLP-task-using-BERT', animation: createQAAnimation },
-            { id: 'sentiment-classifier', title: 'Tanglish Sentiment Classifier', description: 'Developed an NLP-based model to classify tweets and customer reviews written in Tanglish (Tamil + English) and English.', github: 'https://github.com/SharveshSubhash/Tanglish-and-English-Customer-Reviews-sentiment-classifier', animation: createSentimentAnimation },
-            { id: 'gameplay-ai', title: 'Simple Gameplay AI', description: 'Implemented the Minimax AI algorithm for a Tic-Tac-Toe game that can be controlled using speech recognition commands.', github: 'https://github.com/SharveshSubhash/VoiceBasedTicTacToeAI', animation: createGameplayAIAnimation },
-            { id: 'emotion-analysis', title: 'Emotion Analysis for BI', description: 'Designed a web app to analyze emotions from a real-time video feed and plot the results for business intelligence insights.', github: 'https://github.com/EmoDetect-BI', animation: createEmotionAnalysisAnimation },
-            { id: 'fake-currency', title: 'Fake Currency Detection', description: 'Developed a Convolutional Neural Network (CNN) model to accurately detect fake currency from images, using a Kaggle dataset.', github: 'https://github.com/SharveshSubhash/Fake-Currency-Detection-using-Computer-Vision', animation: createFakeCurrencyAnimation }
-        ];
-        const experiences = [
-            { role: 'DL Researcher', company: 'Shabd, IIT Madras Research Park', date: 'May 2025 - June 2025', description: 'Developing a python package "IndianDataFilter" and designing the pipeline for an Indian Language based conversational LLM.'},
-            { role: 'AI Researcher and Educator', company: 'Vizuara AI Labs, Pune', date: 'Feb 2025 - Apr 2025', description: 'Created NLP lecture series, assisted SciML researchers, and conducted experiments for a Loss in Translation research project.'},
-            { role: 'Data Analyst', company: 'Latent View Analytics, Chennai', date: 'Mar 2024 - Jan 2025', description: 'Worked on Microsoft R&I, Causal Discovery, LLMs, CV, RL for EV charging, and developed 14 manufacturing analytics use cases.'},
-            { role: 'Research Associate', company: 'IDRBT, RBI R&D Center, Hyderabad', date: 'Feb 2024 - Mar 2024', description: 'Worked temporarily on adversarial neural networks.'},
-            { role: 'Jr. Machine Learning Engineer', company: 'Omdena, Madagascar', date: 'Nov 2023 - Feb 2024', description: 'Collaborated globally on detecting fake job postings using NLP for the Open-Source Community.'},
-            { role: 'Founder and CEO', company: 'Pin2Joy, Chennai', date: 'Feb 2021 - May 2022', description: 'Founded a P2P eCommerce platform, developed the website, and managed all business operations.'},
-            { role: 'AI Engineering Intern', company: 'Anna Incubation Centre, Chennai', date: 'Nov 2023 - Dec 2023', description: 'Worked on computer vision using YOLO and NLP using transformers and LLMs like Llama2.'},
-        ];
-        const educations = [
-            {degree:'Masters in AI Systems', institution:'National University of Singapore', date: '2025 - present'},
-            { degree: 'Digital Manufacturing Skill', institution: 'IIT, Madras', date: '2024'},
-            { degree: 'AI & ML Youth Program', institution: 'National University of Singapore', date: '2023'},
-            { degree: 'B.Tech in CS (AI & ML)', institution: 'Vellore Institute of Technology', date: '2023'},
-            { degree: 'Class XII (CBSE)', institution: 'Narayana E-techno, Bangalore', date: '2019'},
-        ];
-        const skills = ['Python', 'SQL', 'Power BI', 'Machine Learning', 'Deep Learning', 'Google Cloud', 'Tableau', 'TensorFlow', 'Pytorch', 'GenAI', 'LLM', 'DataBricks', 'Computer Vision', 'Reinforcement Learning', 'NLP', 'BERT', 'YOLO', 'Docker', 'Git'];
-     
-        const youtubeVideos = [
-            { 
-                embedId: 'T6QtIyB09Qs', // Replace with your YouTube Video ID
-                title: 'Introduction to NLP from Scratch', 
-                description: 'A deep dive into the introduction of Natural Language Processing' 
-            },
-            { 
-                embedId: '3JzdXTB_ACs', // Replace with your YouTube Video ID
-                title: 'Machine Learning and Deep learning in NLP', 
-                description: 'An in-depth overview of the evolution of models in NLP domain' 
-            },
-            { 
-                embedId: 'KKIrthRUVx8', // Replace with your YouTube Video ID
-                title: 'Techniques to convert Text to Numbers in NLP', 
-                description: 'Exploring different ways to make text be understood by computers' 
-            },
-            { 
-                embedId: 'Pwh7xBvxvow', // Replace with your YouTube Video ID
-                title: 'NLP Pipeline from Scratch', 
-                description: 'Complete step by step explanation of the NLP Pipeline in production' 
-            },
-             { 
-                embedId: 'vE0-MqDNeWo', // Replace with your YouTube Video ID
-                title: "Industrial Case study of Uber's NLP system", 
-                description: 'Complete in-depth technical case study of the Uber NLP system' 
-            },
-            { 
-                embedId: 'xtZtF6gtlOY', // Replace with your YouTube Video ID
-                title: "Building our own word2vec model from scratch", 
-                description: 'Google developed word2vec model, in this video, we develop our own word2vec model to train it with our own vocabulary' 
-            }
-            
-        ];
+  </nav>
 
-        const youtubeContainer = document.getElementById('youtube-videos-container');
-        if (youtubeContainer) {
-            youtubeVideos.forEach(video => {
-                const card = document.createElement('div');
-                // We reuse the 'project-card' styling for a consistent look and feel
-                // 'flex-shrink-0' is crucial to prevent cards from squishing
-                card.className = 'project-card rounded-lg overflow-hidden flex-shrink-0 w-80 md:w-96'; 
-                
-                card.innerHTML = `
-                    <div class="w-full aspect-video bg-black">
-                        <iframe 
-                            width="100%" 
-                            height="100%" 
-                            src="https://www.youtube.com/embed/${video.embedId}" 
-                            title="${video.title}" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="orbitron text-lg font-bold text-cyan-400">${video.title}</h3>
-                        <p class="mt-2 text-gray-400 text-sm">${video.description}</p>
-                    </div>
-                `;
-                youtubeContainer.appendChild(card);
-            });
-        }
-    
-        const projectsContainer = document.querySelector('#projects .grid');
-        projectsContainer.innerHTML = ''; 
-        projects.forEach(project => {
-            const card = document.createElement('div');
-            card.className = 'project-card rounded-lg p-6 cursor-pointer';
-            card.innerHTML = `<h3 class="orbitron text-xl font-bold text-cyan-300">${project.title}</h3><p class="mt-2 text-gray-400 text-sm">${project.description.substring(0, 100)}...</p>`;
-            card.addEventListener('click', () => openModal(project));
-            projectsContainer.appendChild(card);
-        });
+  <div class="container">
 
-        const experienceContainer = document.querySelector('#career .flex-col .w-full:nth-child(1) .relative');
-        experienceContainer.innerHTML = '';
-        experiences.forEach(exp => {
-            const item = document.createElement('div');
-            item.className = 'relative';
-            item.innerHTML = `<div class="absolute w-4 h-4 bg-cyan-400 rounded-full -left-[39px] mt-1.5 border-2 border-gray-900"></div><p class="text-sm font-semibold text-cyan-500">${exp.date}</p><h4 class="text-lg font-bold text-gray-100">${exp.role}</h4><p class="text-md font-medium text-gray-300">${exp.company}</p><p class="mt-1 text-gray-400 text-sm">${exp.description}</p>`;
-            experienceContainer.appendChild(item);
-        });
-        
-        const educationContainer = document.querySelector('#career .flex-col .w-full:nth-child(2) .relative');
-        educationContainer.innerHTML = '';
-        educations.forEach(edu => {
-            const item = document.createElement('div');
-            item.className = 'relative';
-            item.innerHTML = `<div class="absolute w-4 h-4 bg-cyan-400 rounded-full -left-[39px] mt-1.5 border-2 border-gray-900"></div><p class="text-sm font-semibold text-cyan-500">${edu.date}</p><h4 class="text-lg font-bold text-gray-100">${edu.degree}</h4><p class="text-md font-medium text-gray-300">${edu.institution}</p>`;
-            educationContainer.appendChild(item);
-        });
+    <!-- HERO -->
+    <header class="hero" id="home">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">AI Systems · M.Sc. @ NUS · 2026</div>
+          <h1 class="name">SHARVESH<span class="l2">SUBHASH</span></h1>
+          <div class="role-line">I build <span class="typed" id="typed"></span><span class="cursor"></span></div>
+          <p class="hero-sub">Robotics autonomy &amp; perception engineer working close to the metal — self-supervised vision, visual SLAM, and out-of-distribution anomaly detection for marine and aerial autonomous systems.</p>
+          <div class="hero-actions">
+            <a href="#projects" class="btn btn-primary">Explore the work →</a>
+            <a href="#contact" class="btn btn-ghost">Contact</a>
+          </div>
+          <div class="socials">
+            <a href="https://www.linkedin.com/in/sharveshsubhash/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+            <a href="https://github.com/SharveshSubhash" target="_blank" rel="noopener" aria-label="GitHub"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+            <a href="mailto:cod.sharvesh2002@gmail.com" aria-label="Email"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
+          </div>
+        </div>
+        <div id="hero-canvas-holder">
+          <div class="hud tl">PERCEPTION&nbsp;//&nbsp;<b>ONLINE</b></div>
+          <div class="hud br"><b>SLAM</b>&nbsp;·&nbsp;6-DoF&nbsp;·&nbsp;pointcloud</div>
+        </div>
+      </div>
+    </header>
 
-        const skillsContainer = document.querySelector('#skills .flex');
-        skillsContainer.innerHTML = '';
-        skills.forEach(skill => {
-            const tag = document.createElement('span');
-            tag.className = 'skill-tag text-gray-300 text-sm font-medium mr-2 mb-2 px-4 py-2 rounded-full';
-            tag.textContent = skill;
-            skillsContainer.appendChild(tag);
-        });
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="about-grid reveal">
+        <div>
+          <div class="sec-kicker">// 01 — Profile</div>
+          <p class="about-lead" style="margin-top:18px">I work at the intersection of <em>computer vision, robotics, and deep learning</em> — turning raw sensor streams into perception systems that run on the edge.</p>
+        </div>
+        <div class="about-body">
+          <p>Currently a Robotics Autonomy intern at <strong style="color:var(--ink)">BeeX Autonomous Systems</strong>, building self-supervised vision models (LeJEPA, DINOv3) for explainable out-of-distribution anomaly detection in turbid industrial marine environments — deployed across DGX Spark, Jetson Thor and Xavier for AUVs.</p>
+          <p>Alongside, I'm completing an M.Sc. in AI Systems at the National University of Singapore. My work spans knowledge distillation, self-supervised pretraining for domain-specific imagery, and UAV/underwater systems integrating perception with SLAM — always close to hardware.</p>
+          <div class="stat-grid" style="margin-top:22px">
+            <div class="stat"><div class="n">16+</div><div class="l">Shipped projects</div></div>
+            <div class="stat"><div class="n">4</div><div class="l">Research papers</div></div>
+            <div class="stat"><div class="n">7</div><div class="l">Roles &amp; internships</div></div>
+            <div class="stat"><div class="n">5×</div><div class="l">Hackathon podiums</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        const projectModal = document.getElementById('project-modal');
-        const closeModalBtn = document.getElementById('close-modal');
-        const modalAnimationContainer = document.getElementById('modal-animation-container');
-        let currentAnimation = null;
-    
-        function openModal(project) {
-            document.getElementById('modal-title').textContent = project.title;
-            document.getElementById('modal-description').textContent = project.description;
-            const linksContainer = document.getElementById('modal-links');
-            linksContainer.innerHTML = '';
-            if (project.github) linksContainer.innerHTML += `<a href="${project.github}" target="_blank" class="inline-block bg-gray-700 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded transition">GitHub Repo</a>`;
-            if (project.publication) linksContainer.innerHTML += `<a href="${project.publication}" target="_blank" class="inline-block bg-gray-700 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded transition">Read Publication</a>`;
-            projectModal.classList.remove('hidden');
-            if (project.animation) currentAnimation = project.animation(modalAnimationContainer);
-        }
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 02 — Trajectory</div>
+          <h2 class="sec-title">Experience</h2>
+        </div>
+        <p class="sec-note">From founding a marketplace to shipping perception stacks for autonomous underwater vehicles.</p>
+      </div>
+      <div class="timeline reveal" id="timeline"></div>
+    </section>
 
-        function closeModal() {
-            projectModal.classList.add('hidden');
-            if (currentAnimation) {
-                currentAnimation.stop();
-                currentAnimation = null;
-            }
-            modalAnimationContainer.innerHTML = '';
-        }
+    <!-- EDUCATION -->
+    <section id="education" style="padding-top:30px">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 03 — Foundations</div>
+          <h2 class="sec-title">Education</h2>
+        </div>
+        <p class="sec-note">Formal training in AI systems, computer science and digital manufacturing across NUS, VIT and IIT Madras.</p>
+      </div>
+      <div class="edu-grid reveal" id="education"></div>
+    </section>
 
-        closeModalBtn.addEventListener('click', closeModal);
-        projectModal.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-backdrop')) closeModal();
-        });
-        
-        const bgScene = new THREE.Scene();
-        const bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-        bgCamera.position.z = 1;
-        const bgRenderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas') });
-        bgRenderer.setSize(window.innerWidth, window.innerHeight);
-        const starVertices = [];
-        for (let i = 0; i < 10000; i++) starVertices.push((Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000, (Math.random() - 0.5) * 2000);
-        const starGeometry = new THREE.BufferGeometry();
-        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-        const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0x555555, size: 0.7}));
-        bgScene.add(stars);
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 04 — Selected Work</div>
+          <h2 class="sec-title">Projects</h2>
+        </div>
+        <p class="sec-note">Tap any card for an interactive breakdown. Filter by domain below.</p>
+      </div>
+      <div class="filters reveal" id="filters"></div>
+      <div class="proj-grid" id="proj-grid"></div>
+    </section>
 
-        const heroContainer = document.getElementById('hero-animation');
-        heroContainer.innerHTML = ''; 
-        const heroScene = new THREE.Scene();
-        const heroCamera = new THREE.PerspectiveCamera(75, heroContainer.clientWidth / heroContainer.clientHeight, 0.1, 1000);
-        heroCamera.position.z = 15;
-        const heroRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        heroRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
-        heroContainer.appendChild(heroRenderer.domElement);
-        
-        const layers = [5, 7, 7, 5];
-        const nodes = [];
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.2 });
+    <!-- PUBLICATIONS -->
+    <section id="publications">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 05 — Research</div>
+          <h2 class="sec-title">Publications</h2>
+        </div>
+        <p class="sec-note">Peer-reviewed and in-review work across medical CV, autonomy and conversational AI.</p>
+      </div>
+      <div class="reveal" id="pubs"></div>
+    </section>
 
-        layers.forEach((count, i) => {
-            const layerNodes = [];
-            for (let j = 0; j < count; j++) {
-                const node = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), new THREE.MeshBasicMaterial({ color: 0x00ffff }));
-                node.position.set((i - (layers.length - 1) / 2) * 8, (j - (count - 1) / 2) * 2.5, 0);
-                heroScene.add(node);
-                layerNodes.push(node);
-            }
-            nodes.push(layerNodes);
-        });
+    <!-- HONOURS + LEADERSHIP -->
+    <section id="honours">
+      <div class="two-col">
+        <div class="reveal">
+          <div class="sec-kicker">// 06 — Recognition</div>
+          <h2 class="sec-title" style="margin-bottom:30px">Honours</h2>
+          <div id="awards"></div>
+        </div>
+        <div class="reveal">
+          <div class="sec-kicker">// 07 — Beyond the lab</div>
+          <h2 class="sec-title" style="margin-bottom:30px">Leadership</h2>
+          <div id="leadership"></div>
+        </div>
+      </div>
+    </section>
 
-        for (let i = 0; i < nodes.length - 1; i++) {
-            nodes[i].forEach(startNode => {
-                nodes[i + 1].forEach(endNode => {
-                    const points = [startNode.position, endNode.position];
-                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                    const line = new THREE.Line(geometry, lineMaterial);
-                    heroScene.add(line);
-                });
-            });
-        }
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 08 — Toolkit</div>
+          <h2 class="sec-title">Skills &amp; Certifications</h2>
+        </div>
+        <p class="sec-note">The stack I reach for, from sensors and SLAM to LLMs and the cloud.</p>
+      </div>
+      <div class="reveal" id="skills-wrap"></div>
+    </section>
 
-        function createBaseScene(container) { const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000); const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(container.clientWidth, container.clientHeight); renderer.setClearColor(0x000000, 0); container.appendChild(renderer.domElement); scene.add(new THREE.AmbientLight(0xffffff, 0.5)); const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); directionalLight.position.set(5, 10, 7.5); scene.add(directionalLight); let animationFrameId; let updateLoop = () => {}; const animate = () => { updateLoop(); renderer.render(scene, camera); animationFrameId = requestAnimationFrame(animate); }; const stop = () => { if (animationFrameId) cancelAnimationFrame(animationFrameId); renderer.dispose(); if (container && renderer.domElement.parentNode === container) container.removeChild(renderer.domElement); }; const setUpdateLoop = (newLoop) => { updateLoop = newLoop; }; const onResize = () => { if (!container.clientWidth || !container.clientHeight) return; camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); }; new ResizeObserver(onResize).observe(container); onResize(); return { scene, camera, animate, stop, setUpdateLoop }; }
-        function createTextCanvas(text, width, height, fontSize = 24) { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = width; canvas.height = height; ctx.font = `${fontSize}px Orbitron`; ctx.fillStyle = '#00ffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, width / 2, height / 2); return new THREE.CanvasTexture(canvas); }
-        function createDriverAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 10; const group = new THREE.Group(); scene.add(group); const carBody = new THREE.Mesh(new THREE.BoxGeometry(5, 2, 2.5), new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 })); group.add(carBody); const carTop = new THREE.Mesh(new THREE.BoxGeometry(3, 1.5, 2), new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 })); carTop.position.set(0, 1.5, 0); group.add(carTop); const icons = ['📱', '🗣️', '☕', '😴', '🎶']; const sprites = icons.map((icon, i) => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = 64; canvas.height = 64; ctx.font = '48px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(icon, 32, 32); const spriteMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), color: 0x00ffff, transparent: true }); const sprite = new THREE.Sprite(spriteMat); sprite.position.set(Math.cos(i * Math.PI * 2 / 5) * 4, 2, Math.sin(i * Math.PI * 2 / 5) * 4); sprite.scale.set(1.5, 1.5, 1.5); scene.add(sprite); return sprite; }); setUpdateLoop(() => { group.rotation.y += 0.005; sprites.forEach(sprite => { sprite.position.y = 2 + Math.sin(Date.now() * 0.002 + sprite.position.x) * 0.5; }); }); animate(); return { stop }; }
-        function createEVStationAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.set(0, 15, 15); camera.lookAt(0, 0, 0); scene.add(new THREE.GridHelper(20, 20, 0x00ffff, 0x444444)); const buildingGeo = new THREE.BoxGeometry(1, 1, 1); for (let i = 0; i < 50; i++) { const building = new THREE.Mesh(buildingGeo, new THREE.MeshStandardMaterial({ color: 0x333344, roughness: 0.8 })); building.position.set((Math.random() - 0.5) * 20, Math.random() * 2 + 0.5, (Math.random() - 0.5) * 20); building.scale.y = Math.random() * 4 + 1; scene.add(building); } const stationGeo = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 16); const stationMat = new THREE.MeshPhongMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 1 }); for (let i = 0; i < 5; i++) { const station = new THREE.Mesh(stationGeo, stationMat); station.position.set((Math.random() - 0.5) * 15, 0.75, (Math.random() - 0.5) * 15); scene.add(station); } setUpdateLoop(() => { scene.rotation.y += 0.002; }); animate(); return { stop }; }
-        function createDefectAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 8; const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(0, 4); shape.lineTo(1, 4); shape.lineTo(1, 2); shape.lineTo(3, 2); shape.lineTo(3, 4); shape.lineTo(4, 4); shape.lineTo(4, 0); shape.lineTo(0, 0); const geometry = new THREE.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false }); geometry.center(); const part = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: 0x8899aa, metalness: 0.8, roughness: 0.4 })); scene.add(part); const defect = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1, transparent: true, opacity: 0.8 })); defect.position.set(1.5, 0, 0.55); part.add(defect); setUpdateLoop(() => { part.rotation.x += 0.005; part.rotation.y += 0.008; defect.material.opacity = (Math.sin(Date.now() * 0.005) + 1) * 0.3 + 0.4; }); animate(); return { stop }; }
-        function createVoiceAssistantAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 5; const group = new THREE.Group(); scene.add(group); const icoGeo = new THREE.IcosahedronGeometry(1.5, 1); const wireframeGeo = new THREE.WireframeGeometry(icoGeo); const mat = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.8 }); group.add(new THREE.LineSegments(wireframeGeo, mat)); const particlesGeo = new THREE.BufferGeometry(); particlesGeo.setAttribute('position', new THREE.Float32BufferAttribute(icoGeo.attributes.position.array, 3)); group.add(new THREE.Points(particlesGeo, new THREE.PointsMaterial({ color: 0x00ffff, size: 0.08 }))); setUpdateLoop(() => { group.rotation.y += 0.003; const audioWave = (Math.sin(Date.now() * 0.005) + 1) / 2; const scale = 1 + audioWave * 0.2; group.scale.set(scale, scale, scale); mat.opacity = 0.5 + audioWave * 0.5; }); animate(); return { stop }; }
-        function createFakeCurrencyAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 10; const note = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.5), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('https://placehold.co/400x175/3b82f6/ffffff?text=BANKNOTE&font=roboto') })); note.position.y = 1; scene.add(note); const scanner = new THREE.Mesh(new THREE.PlaneGeometry(9, 0.2), new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.7 })); scanner.position.z = 0.1; scene.add(scanner); let textMesh; new THREE.FontLoader().load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', font => { const textGeo = new THREE.TextGeometry('VERIFIED', { font: font, size: 0.8, height: 0.1 }); textGeo.center(); textMesh = new THREE.Mesh(textGeo, new THREE.MeshPhongMaterial({ color: 0x00ff00 })); textMesh.position.y = -2; textMesh.visible = false; scene.add(textMesh); }); let scanProgress = 0; setUpdateLoop(() => { scanProgress = (scanProgress + 0.01) % 1; scanner.position.y = 2.5 - (scanProgress * 3); if (textMesh) textMesh.visible = scanProgress > 0.95; note.rotation.y += 0.002; }); animate(); return { stop }; }
-        function createIndianDataFilterAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 15; const particles = []; const colors = [0xff0000, 0x00ff00, 0x00ffff]; for (let i = 0; i < 300; i++) { const isIndian = Math.random() > 0.5; const particle = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: isIndian ? colors[1] : colors[0], size: 0.2 })); particle.geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3)); particle.position.set((Math.random() - 0.5) * 20, 10, (Math.random() - 0.5) * 10); particle.isIndian = isIndian; particles.push(particle); scene.add(particle); } const filterPlane = new THREE.Mesh(new THREE.PlaneGeometry(25, 5), new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.2, side: THREE.DoubleSide })); filterPlane.rotation.x = Math.PI / 4; scene.add(filterPlane); setUpdateLoop(() => { particles.forEach(p => { p.position.y -= 0.05; if (p.position.y < -10) p.position.y = 10; p.material.color.set(p.position.y < 1.5 && p.position.y > -1.5 ? (p.isIndian ? colors[1] : colors[2]) : (p.isIndian ? colors[1] : colors[0])); }); }); animate(); return { stop }; }
-        function createObjectCaptioningAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 12; scene.add(new THREE.Mesh(new THREE.PlaneGeometry(16, 9), new THREE.MeshBasicMaterial({ color: 0x111111 }))); const boxHelper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3)), 0x00ff00); boxHelper.visible = false; scene.add(boxHelper); const textSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: createTextCanvas("Object", 256, 64), color: 0x00ff00 })); textSprite.scale.set(4, 1, 1); textSprite.visible = false; scene.add(textSprite); let time = 0; setUpdateLoop(() => { time += 0.02; const x = Math.sin(time) * 4; const y = Math.cos(time * 0.7) * 2; boxHelper.position.set(x, y, 0); textSprite.position.set(x, y + 2, 0); boxHelper.visible = textSprite.visible = true; }); animate(); return { stop }; }
-        function createNERAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 10; const sentence = ["Sharvesh", "went", "to", "Chennai"]; const colors = [0x00ffff, 0xffffff, 0xffffff, 0x00ff00]; let currentX = -6; sentence.forEach((word, i) => { const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: createTextCanvas(word, 256, 64, 32), color: colors[i] })); sprite.scale.set(word.length * 0.5, 1, 1); sprite.position.x = currentX + (word.length * 0.5) / 2; currentX += (word.length * 0.5) + 0.5; scene.add(sprite); }); setUpdateLoop(() => { scene.rotation.y += 0.005; }); animate(); return { stop }; }
-        function createQAAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 12; const qSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: createTextCanvas("What is BERT?", 512, 128, 28), color: 0xffffff })); qSprite.scale.set(8, 2, 1); qSprite.position.y = 2; scene.add(qSprite); const aSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: createTextCanvas("A Transformer Model", 512, 128, 28), color: 0x00ffff })); aSprite.scale.set(8, 2, 1); aSprite.position.y = -2; aSprite.visible = false; scene.add(aSprite); setTimeout(() => { aSprite.visible = true; }, 2000); animate(); return { stop }; }
-        function createSentimentAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 10; const reviews = [{ text: "Loved it! 😄", sentiment: 1 }, { text: "Very bad 😠", sentiment: -1 }, { text: "Okay I guess 🤔", sentiment: 0 }]; const sprites = reviews.map((review, i) => { const color = review.sentiment > 0 ? 0x00ff00 : review.sentiment < 0 ? 0xff0000 : 0xffffff; const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: createTextCanvas(review.text, 512, 128, 30), color: color })); sprite.scale.set(8, 2, 1); sprite.position.set((i - 1) * 9, Math.random() * 4 - 2, 0); scene.add(sprite); return sprite; }); setUpdateLoop(() => { sprites.forEach(s => { s.position.x -= 0.02; if(s.position.x < -15) s.position.x = 15; }); }); animate(); return { stop }; }
-        function createGameplayAIAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 8; const group = new THREE.Group(); scene.add(group); const gridHelper = new THREE.GridHelper(6, 3, 0x00ffff, 0x00ffff); gridHelper.rotation.x = Math.PI / 2; group.add(gridHelper); const moves = [{ p: [-2, 2, 0], s: 'X' }, { p: [0, 2, 0], s: 'O' }, { p: [2, 0, 0], s: 'X' }, { p: [0, 0, 0], s: 'O' }]; moves.forEach((move, i) => { const mat = new THREE.SpriteMaterial({ map: createTextCanvas(move.s, 64, 64, 48), color: move.s === 'X' ? 0xff00ff : 0x00ff00 }); const sprite = new THREE.Sprite(mat); sprite.scale.set(1.5, 1.5, 1); sprite.position.fromArray(move.p); sprite.visible = false; group.add(sprite); setTimeout(() => { sprite.visible = true; }, i * 1000); }); setUpdateLoop(() => { group.rotation.z += 0.005; }); animate(); return { stop }; }
-        function createEmotionAnalysisAnimation(container) { const { scene, camera, animate, stop, setUpdateLoop } = createBaseScene(container); camera.position.z = 10; const headOutline = new THREE.Line(new THREE.CircleGeometry(3, 32), new THREE.LineBasicMaterial({ color: 0x00ffff })); scene.add(headOutline); const eyeL = new THREE.Line(new THREE.CircleGeometry(0.3, 16), new THREE.LineBasicMaterial({ color: 0x00ffff })); eyeL.position.x = -1; eyeL.position.y = 1; scene.add(eyeL); const eyeR = eyeL.clone(); eyeR.position.x = 1; scene.add(eyeR); const mouth = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1, -1, 0), new THREE.Vector3(1, -1, 0)]), new THREE.LineBasicMaterial({ color: 0x00ffff })); scene.add(mouth); const emotions = ["Happy", "Sad", "Neutral"]; let currentEmotion = 0; setInterval(() => { currentEmotion = (currentEmotion + 1) % emotions.length; if (emotions[currentEmotion] === 'Happy') mouth.geometry.setFromPoints([new THREE.Vector3(-1, -1.2, 0), new THREE.Vector3(0, -0.8, 0), new THREE.Vector3(1, -1.2, 0)]); else if (emotions[currentEmotion] === 'Sad') mouth.geometry.setFromPoints([new THREE.Vector3(-1, -0.8, 0), new THREE.Vector3(0, -1.2, 0), new THREE.Vector3(1, -0.8, 0)]); else mouth.geometry.setFromPoints([new THREE.Vector3(-1, -1, 0), new THREE.Vector3(1, -1, 0)]); }, 2000); animate(); return { stop }; }
+    <!-- YOUTUBE -->
+    <section id="youtube">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-kicker">// 09 — Teaching</div>
+          <h2 class="sec-title">From my channel</h2>
+        </div>
+        <p class="sec-note">NLP lecture series produced during my time as an AI educator at Vizuara AI Labs.</p>
+      </div>
+      <div class="yt-rail reveal" id="yt-rail"></div>
+    </section>
 
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        });
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            stars.position.set(mouseX * 2, mouseY * 2, 0);
-            bgRenderer.render(bgScene, bgCamera);
-            heroScene.rotation.y += 0.001 + mouseX * 0.05;
-            heroScene.rotation.x = mouseY * 0.05;
-            heroRenderer.render(heroScene, heroCamera);
-        }
-        animate();
+  </div>
 
-        window.addEventListener('resize', () => {
-            bgCamera.aspect = window.innerWidth / window.innerHeight;
-            bgCamera.updateProjectionMatrix();
-            bgRenderer.setSize(window.innerWidth, window.innerHeight);
-            heroCamera.aspect = heroContainer.clientWidth / heroContainer.clientHeight;
-            heroCamera.updateProjectionMatrix();
-            heroRenderer.setSize(heroContainer.clientWidth, heroContainer.clientHeight);
-        });
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="container">
+      <div class="foot-grid reveal">
+        <div>
+          <div class="sec-kicker">// Let's build</div>
+          <div class="foot-big" style="margin-top:14px">Got a perception<br>problem? <a href="mailto:cod.sharvesh2002@gmail.com">Say hello&nbsp;→</a></div>
+        </div>
+        <div class="contact-list">
+          <a href="mailto:cod.sharvesh2002@gmail.com"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>cod.sharvesh2002@gmail.com</a>
+          <a href="tel:+6589790504"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 5c0 8 7 15 15 15l2-3-4-2-2 2c-3-1-6-4-7-7l2-2-2-4z"/></svg>+65 8979 0504</a>
+          <span style="padding-left:26px;color:var(--muted-2)">+91 75488 90774</span>
+          <a href="https://www.linkedin.com/in/sharveshsubhash/" target="_blank" rel="noopener"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>linkedin.com/in/sharveshsubhash</a>
+          <a href="https://github.com/SharveshSubhash" target="_blank" rel="noopener"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>github.com/SharveshSubhash</a>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <p>© 2026 Sharvesh Subhash — Singapore</p>
+        <p>Built with Three.js · designed as a perception instrument</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-bg" data-close></div>
+  <div class="modal-card">
+    <button class="close-x" data-close aria-label="close">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="modal-viz" id="modal-viz"><div class="vlabel" id="modal-vlabel">VISUALIZATION</div></div>
+    <div class="modal-body">
+      <div class="mct" id="modal-cat"></div>
+      <h3 id="modal-title"></h3>
+      <p class="md" id="modal-desc"></p>
+      <div class="modal-tags" id="modal-tags"></div>
+      <div class="modal-links" id="modal-links"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  /* =========================================================
+     DATA
+  ==========================================================*/
+  const GH='https://github.com/SharveshSubhash';
+
+  const experiences=[
+    {role:'Robotics Autonomy Intern',org:'BeeX Autonomous Systems',loc:'Singapore',when:'Mar 2026 — Present',now:true,
+     d:'Building self-supervised computer-vision models (LeJEPA, DINOv3) for explainable out-of-distribution anomaly detection through perception in turbid industrial marine environments. Deploying across DGX Spark, Jetson Thor and Xavier for autonomous underwater vehicles.'},
+    {role:'Deep Learning Researcher',org:'Shabd · IIT Madras Research Park',loc:'Chennai',when:'May 2025',now:false,
+     d:'Created the "IndianDataFilter" Python package to scrape Indian-script text data. Consulted on and designed the complete pipeline and experiments for an Indian-language conversational LLM — from dataset creation through pre-training to fine-tuning.'},
+    {role:'AI Researcher & Educator',org:'Vizuara AI Labs',loc:'Pune',when:'Feb 2025 — Apr 2025',now:false,
+     d:'Authored an NLP lecture series, assisted SciML researchers (Neural ODE, UDE, PINNs), and ran experiments for the "Loss in Translation" project alongside founders Dr. Sreedath Panat and Dr. Raj Dandekar (MIT).'},
+    {role:'Data Analyst',org:'LatentView Analytics',loc:'Chennai',when:'Mar 2024 — Jan 2025',now:false,
+     d:'Highest-ranked employee in the fresher batch of the industrial practice. Deployed to the Microsoft Research & Insights team for Causal Discovery with knowledge graphs + LLMs/LCM. Built the RL framework for EV charging-station siting (Ford Pro POC, +30% KPI) and 14 manufacturing-analytics use cases. Received an official letter of recommendation from the Global Business Head.'},
+    {role:'Junior Machine Learning Engineer',org:'Omdena',loc:'Remote · Madagascar',when:'Dec 2023 — Feb 2024',now:false,
+     d:'Collaborated globally on detecting fraudulent job postings using NLP for the open-source community, improving detection accuracy by 10%.'},
+    {role:'AI Engineering Intern',org:'Anna Incubation Centre, CEG',loc:'Chennai',when:'Nov 2023 — Dec 2023',now:false,
+     d:'Deployed a computer-vision system with YOLO and NLP pipelines using transformers and LLMs such as Llama2.'},
+    {role:'Founder & CEO',org:'Pin2Joy',loc:'Chennai',when:'Feb 2021 — May 2022',now:false,
+     d:'Founded a peer-to-peer eCommerce platform — built the website and a scalable backend for concurrent queries, optimized database latency, and ran sales, marketing and operations end-to-end.'},
+  ];
+
+  const educations=[
+    {degree:'M.Sc. in Artificial Intelligence Systems',inst:'National University of Singapore (NUS)',when:'2025 — 2026',badge:'In Progress',det:'Graduate coursework spanning intelligent robotics systems and architecting agentic AI systems.'},
+    {degree:'B.Tech in Computer Science (AI & ML)',inst:'Vellore Institute of Technology (VIT)',when:'2019 — 2023',badge:'',det:'CGPA 8.06 / 10.0 · Specialization in Artificial Intelligence & Machine Learning.'},
+    {degree:'AI & Machine Learning Youth Program',inst:'National University of Singapore — Kent Ridge',when:'2023',badge:'Distinction',det:'Graduated with Distinction — the highest grade awarded in the program.'},
+    {degree:'Digital Manufacturing — Mechanical Design & Simulation',inst:'Indian Institute of Technology, Madras',when:'2024',badge:'',det:'Skill-training programme covering digital manufacturing, design and simulation.'},
+  ];
+
+  const projects=[
+    // ---- NEW (from updated resume) ----
+    {id:'drone-vslam',cat:'Robotics & Perception',title:'Intelligent Autonomous Drone — Semantic Visual SLAM',
+     short:'A lean semantic Visual-SLAM stack with a memory layer for UAV-based industrial inspection.',
+     desc:'Built for NUS\'s Intelligent Robotics Systems module on an F450 DJI drone with a Jetson Orin Nano and Pixhawk flight controller. An end-to-end perception and memory layer fusing Visual SLAM with semantics and a VLM — a novel lean vslam designed specifically for inspection after extensive experimentation, packaged as "semantic_vslam" with a Redis-backed memory layer and NanoOWL open-vocabulary detection. Simulated in Isaac Sim and Gazebo with QGroundControl.',
+     tags:['cuVSLAM','ROS 2','NanoOWL','Pixhawk','Redis','Isaac Sim','Jetson Orin'],
+     links:[{l:'Semantic-VSLAM package',u:'https://github.com/SharveshSubhash/Semantic_Cuda_optimized_Visual_Slam'},{l:'Watch demo',u:'https://youtu.be/PTb1uUwm1n8'}],anim:'drone'},
+    {id:'truthforge',cat:'Agentic AI',title:'TruthForge AI — Multi-Agent Legal Analysis',
+     short:'Six orchestrated agents that check legal transcripts and testimonies for factual inconsistencies.',
+     desc:'Built for the "Architecting Agentic AI Systems" module at NUS. A framework of six independent agents working in orchestration to help law firms detect factual inconsistencies across legal transcripts and testimonies — with production-grade security tests and a full CI/CD workflow.',
+     tags:['LangGraph','Multi-Agent','RAG','CI/CD','Security Testing'],
+     links:[{l:'GitHub',u:GH},{l:'Demo video',u:GH}],anim:'agents'},
+    {id:'aristotle',cat:'Agentic AI',title:'Aristotle — Agentic Developer Assistant',
+     short:'A VS Code extension that boosts developer productivity with a knowledge graph + vector DB and LLMs.',
+     desc:'A VS Code extension–based agentic developer assistant that accelerates the software-development process by combining a Knowledge Graph and a Vector Database with LLMs — using FAISS-RAG, Graphiti, Neo4j and LangGraph for grounded, context-aware assistance.',
+     tags:['LangGraph','Neo4j','Graphiti','FAISS-RAG','Vector DB','VS Code'],
+     links:[{l:'GitHub',u:GH},{l:'Demo video',u:GH}],anim:'graph'},
+    {id:'eeg-bci',cat:'Computer Vision',title:'Recurrence-Plot ViT for MI-EEG (BCI)',
+     short:'Vision Transformer classification of motor-imagery EEG via recurrence-plot encodings.',
+     desc:'Bachelor\'s thesis / final-year capstone. Transforms motor-imagery EEG signals into recurrence plots and classifies them with a Vision Transformer for a brain–computer interface. An individual original work (unpublished).',
+     tags:['Vision Transformer','EEG','Recurrence Plots','BCI','PyTorch'],
+     links:[],anim:'eeg'},
+
+    // ---- EXISTING (kept from the original site / resume) ----
+    {id:'driver-behavior',cat:'Computer Vision',title:'Driver Behavior Detection',
+     short:'Swin Transformer transfer learning to classify 10 distracted driver states.',
+     desc:'Applied transfer learning with a Swin Transformer to classify 10 distracted states of a driver as classes, using the 4.3 GB State Farm dataset and achieving 99% validation accuracy.',
+     tags:['Swin Transformer','Transfer Learning','PyTorch','State Farm'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/DashCam-Model-for-Driver-Behavior-Identification'}],anim:'driver'},
+    {id:'defect-detection',cat:'Computer Vision',title:'Industrial Component Defect Detection',
+     short:'Manufacturing-analytics CV using YOLO to flag defects in industrial components.',
+     desc:'A computer-vision project for manufacturing analytics, executed internally while experimenting with solutions as a data analyst at LatentView. Uses models such as YOLO to identify defects in industrial components.',
+     tags:['YOLO','OpenCV','Manufacturing','Defect Detection'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Industrial_Surface_Defect_Detection_using_Computer_Vision_For_Manufacturing'}],anim:'defect'},
+    {id:'object-captioning',cat:'Computer Vision',title:'Real-time Object Captioning',
+     short:'Real-time detection, recognition and voice-based captioning for video.',
+     desc:'An internal prototype built as an AI Engineering intern at Anna Incubation Centre — performs object detection, recognition and voice-based captioning for real-time video streams.',
+     tags:['YOLO','OpenCV','TTS','Real-time'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Real-Time-Video-based-Object-Detection-and-Speech-based-Video-Captioning'}],anim:'caption'},
+    {id:'emotion-bi',cat:'Computer Vision',title:'Emotion Analysis for BI',
+     short:'Web app that reads emotions from live video and plots them for business intelligence.',
+     desc:'A web application that analyzes emotions from a real-time video feed and plots the results to surface business-intelligence insights.',
+     tags:['Computer Vision','CNN','Real-time','Dashboards'],
+     links:[{l:'GitHub',u:GH}],anim:'emotion'},
+    {id:'fake-currency',cat:'Computer Vision',title:'Fake Currency Detection',
+     short:'CNN that detects counterfeit currency from images.',
+     desc:'Developed a Convolutional Neural Network to accurately detect fake currency from images, trained on a Kaggle dataset.',
+     tags:['CNN','Image Classification','Kaggle'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Fake-Currency-Detection-using-Computer-Vision'}],anim:'currency'},
+    {id:'ev-location',cat:'RL & Optimization',title:'Optimal EV Station Location',
+     short:'RL framework for siting NYC charging stations + port-vacancy prediction.',
+     desc:'Developed a complete reinforcement-learning framework and prediction module for siting new EV charging stations in New York, with charging-port vacancy prediction and A* optimal routing — improving the recommended-location KPI by 30% (Ford Pro POC at LatentView).',
+     tags:['Reinforcement Learning','A* Search','Prediction','NYC'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Optimal_Location_And_Utilization_Prediction_NYC_Project'}],anim:'ev'},
+    {id:'gameplay-ai',cat:'RL & Optimization',title:'Voice-Controlled Gameplay AI',
+     short:'Minimax Tic-Tac-Toe AI driven by speech-recognition commands.',
+     desc:'Implemented the Minimax algorithm for a Tic-Tac-Toe agent that plays optimally and can be controlled entirely with speech-recognition commands.',
+     tags:['Minimax','Game AI','Speech Recognition'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/VoiceBasedTicTacToeAI'}],anim:'gameplay'},
+    {id:'indian-filter',cat:'NLP & LLM',title:'Indian Data Filter Package',
+     short:'A Python package for filtering Indian-script text data.',
+     desc:'A Python package created for filtering Indian-script-based data, developed during my tenure at the IIT Madras SSB lab and Research-Park-based Shabd Intelligence as part of an Indian-language LLM pipeline.',
+     tags:['Python','NLP','Tooling','Indic Scripts'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/IndianDataFilter'}],anim:'filter'},
+    {id:'voice-assistant',cat:'NLP & LLM',title:'Voice-Based Virtual Assistant',
+     short:'Fine-tuned Llama2-7b for chatbot use cases, served via Hugging Face.',
+     desc:'An internal prototype built as an AI Engineering intern — fine-tuned the Llama2-7b model for chatbot use cases and saved the model in the Hugging Face framework for downstream use.',
+     tags:['Llama2-7b','Fine-tuning','Hugging Face','Speech'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Voice-based-LLM-Chatbot-7b'}],anim:'voice'},
+    {id:'ner-bert',cat:'NLP & LLM',title:'Named Entity Recognition with BERT',
+     short:'Fine-tuned BERT to classify names and entities in sentences.',
+     desc:'Pre-processed a dataset and fine-tuned a BERT transformer for accurate classification of names and entities within sentences.',
+     tags:['BERT','NER','Transformers','NLP'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Name-Entity-Recognition-NLP-task-using-BERT'}],anim:'ner'},
+    {id:'qa-bert',cat:'NLP & LLM',title:'Question Answering with BERT',
+     short:'Fine-tuned BERT for extractive question answering.',
+     desc:'Pre-processed a dataset and fine-tuned a BERT transformer to achieve strong accuracy on the question-answering task.',
+     tags:['BERT','QA','Transformers','NLP'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Question-Answering-NLP-task-using-BERT'}],anim:'qa'},
+    {id:'sentiment',cat:'NLP & LLM',title:'Tanglish Sentiment Classifier',
+     short:'Sentiment model for code-mixed Tamil-English (Tanglish) reviews & tweets.',
+     desc:'Developed an NLP model to classify the sentiment of tweets and customer reviews written in Tanglish (Tamil + English) as well as English.',
+     tags:['NLP','Sentiment','Code-mixing','Tamil'],
+     links:[{l:'GitHub',u:'https://github.com/SharveshSubhash/Tanglish-and-English-Customer-Reviews-sentiment-classifier'}],anim:'sentiment'},
+  ];
+
+  const publications=[
+    {title:'A Novel AI Model for Endolaparoscopic TEP Inguinal Hernia Repair',
+     meta:'Second author with NUS Medicine surgeons. Developed a state-of-the-art segmentation-based computer-vision model to identify tissues and organs in laparoscopic surgical video.',
+     venue:'British Journal of Surgery · Oxford University Press',status:'In Review'},
+    {title:'Self-Driving Cars to Drive Autonomously using Deep Learning',
+     meta:'Trained a CNN–RNN model on simulated car-game data to give autonomous navigation capability to a toy car.',
+     venue:'IJARESM',status:'Published'},
+    {title:'Refining Automated Image Annotations with Transfer Learning and Dynamic Sampling Strategies',
+     meta:'Proposed a method to automate most of the image-annotation task with the least manual intervention.',
+     venue:'IJARESM',status:'Published'},
+    {title:'Conversational AI Dialog for Medicare powered by Fine-Tuning and RAG',
+     meta:'Compared fine-tuning against retrieval-augmented generation in the context of doctor–patient chat conversations across multiple datasets.',
+     venue:'Manuscript submitted',status:'In Review'},
+  ];
+
+  const awards=[
+    {rk:'2nd',sub:'PLACE',at:'Image Analytics Hackathon',av:'LatentView · 2024'},
+    {rk:'3rd',sub:'PLACE',at:'Vision Safety Tech Fest',av:'IIT Bombay · 2021–22'},
+    {rk:'4th',sub:'PLACE',at:'Road Safety National Hackathon Finale',av:'IIT Delhi · 2023'},
+    {rk:'#4468',sub:'/190K+',at:'VITEEE 2019',av:'National engineering entrance rank'},
+    {rk:'Gold',sub:'MEDALS',at:'Science &amp; Maths Olympiad',av:'School level, high school'},
+  ];
+
+  const leadership=[
+    {h:'Programming &amp; Analysis Lead',w:'DreadNought Robotics · Jun 2020 — Apr 2021',p:'Led team projects, managed workload distribution, and trained new members.'},
+    {h:'Core Council Member',w:'AUVSI International',p:'Contributed to decision-making processes within the organization.'},
+    {h:'Founder & Volunteer',w:'National Youth Integrity (not-for-profit)',p:'Founded a non-profit; trained in classical music composition; tutor Physics and Mathematics to underprivileged JEE / competitive-exam aspirants.'},
+  ];
+
+  const skillGroups=[
+    {label:'ML / Deep Learning',items:['Deep Learning','Machine Learning','PyTorch','TensorFlow','Computer Vision','NLP','Reinforcement Learning','Self-Supervised Learning','Knowledge Distillation']},
+    {label:'Robotics & Perception',items:['ROS 2','NVIDIA Isaac Sim','OpenCV','Visual SLAM','RT-2 VLA','VLMs','Jetson / Edge','Solidworks']},
+    {label:'LLM / GenAI',items:['LLMs','GenAI','BERT','RAG','LangGraph','Llama2']},
+    {label:'Data, Cloud & Tools',items:['Python','SQL','GCP','Databricks','Power BI','Tableau','Docker','Git']},
+    {label:'Certifications',cert:true,items:['NVIDIA Certified GenAI LLM Associate','Databricks Certified Data Engineer Associate','Google Cloud (Authorized Training)','VLM Certification','Lean Six Sigma — Yellow Belt']},
+  ];
+
+  const youtubeVideos=[
+    {id:'T6QtIyB09Qs',t:'Introduction to NLP from Scratch',d:'A deep dive into the foundations of Natural Language Processing.'},
+    {id:'3JzdXTB_ACs',t:'Machine Learning & Deep Learning in NLP',d:'How models in the NLP domain evolved over time.'},
+    {id:'KKIrthRUVx8',t:'Text → Numbers in NLP',d:'Techniques to make text understandable to computers.'},
+    {id:'Pwh7xBvxvow',t:'NLP Pipeline from Scratch',d:'Step-by-step walkthrough of a production NLP pipeline.'},
+    {id:'vE0-MqDNeWo',t:"Uber's NLP System — Case Study",d:'An in-depth technical case study of Uber\'s NLP system.'},
+    {id:'xtZtF6gtlOY',t:'Building word2vec from Scratch',d:'Training our own word2vec model on a custom vocabulary.'},
+  ];
+
+  /* =========================================================
+     RENDER
+  ==========================================================*/
+  // Experience
+  const tl=document.getElementById('timeline');
+  experiences.forEach(e=>{
+    const el=document.createElement('div');
+    el.className='exp'+(e.now?' now':'');
+    el.innerHTML=`<span class="node"></span>
+      <div class="when">${e.when}${e.now?'<span class="now-tag">Now</span>':''}</div>
+      <h4>${e.role}</h4>
+      <div class="org">${e.org} <span>· ${e.loc}</span></div>
+      <p class="d">${e.d}</p>`;
+    tl.appendChild(el);
+  });
+
+  // Education
+  const eduWrap=document.getElementById('education');
+  educations.forEach(e=>{
+    const el=document.createElement('div');el.className='edu';
+    el.innerHTML=`<div class="ew"><span>${e.when}</span>${e.badge?`<span class="badge">${e.badge}</span>`:''}</div>
+      <h4>${e.degree}</h4><div class="inst">${e.inst}</div><div class="det">${e.det}</div>`;
+    eduWrap.appendChild(el);
+  });
+
+  // Filters
+  const cats=['All',...Array.from(new Set(projects.map(p=>p.cat)))];
+  const fwrap=document.getElementById('filters');
+  cats.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='filter'+(i===0?' active':'');
+    b.textContent=c;
+    b.onclick=()=>{
+      document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.querySelectorAll('.card').forEach(card=>{
+        card.classList.toggle('hide', c!=='All' && card.dataset.cat!==c);
+      });
+    };
+    fwrap.appendChild(b);
+  });
+
+  // Projects
+  const grid=document.getElementById('proj-grid');
+  projects.forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='card';card.dataset.cat=p.cat;
+    card.innerHTML=`<div class="top"><span class="idx">${String(i+1).padStart(2,'0')}</span><span class="ct">${p.cat}</span></div>
+      <h3>${p.title}</h3><p>${p.short}</p>
+      <div class="go">view breakdown <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>`;
+    card.onclick=()=>openModal(p);
+    grid.appendChild(card);
+  });
+
+  // Publications
+  const pubs=document.getElementById('pubs');
+  publications.forEach((p,i)=>{
+    const el=document.createElement('div');el.className='pub';
+    const cls=p.status==='Published'?'pub':'review';
+    el.innerHTML=`<div class="pn">P${String(i+1).padStart(2,'0')}</div>
+      <div><h4>${p.title}</h4><p class="meta">${p.meta}</p><div class="venue">↳ ${p.venue}</div></div>
+      <div class="pill ${cls}">${p.status}</div>`;
+    pubs.appendChild(el);
+  });
+
+  // Awards
+  const aw=document.getElementById('awards');
+  awards.forEach(a=>{
+    const el=document.createElement('div');el.className='award';
+    el.innerHTML=`<div class="rk">${a.rk}<small>${a.sub}</small></div><div><div class="at">${a.at}</div><div class="av">${a.av}</div></div>`;
+    aw.appendChild(el);
+  });
+
+  // Leadership
+  const ld=document.getElementById('leadership');
+  leadership.forEach(l=>{
+    const el=document.createElement('div');el.className='lead-card';
+    el.innerHTML=`<h4>${l.h}</h4><div class="lw">${l.w}</div><p>${l.p}</p>`;
+    ld.appendChild(el);
+  });
+
+  // Skills
+  const sw=document.getElementById('skills-wrap');
+  skillGroups.forEach(g=>{
+    const block=document.createElement('div');block.className='skill-block';
+    const tags=g.items.map(t=>`<span class="tag${g.cert?' cert':''}">${t}</span>`).join('');
+    block.innerHTML=`<div class="sb-label">${g.label}</div><div class="tags">${tags}</div>`;
+    sw.appendChild(block);
+  });
+
+  // YouTube
+  const yt=document.getElementById('yt-rail');
+  youtubeVideos.forEach(v=>{
+    const c=document.createElement('div');c.className='yt-card';
+    const frame=document.createElement('div');frame.className='frame';
+    frame.innerHTML=`<img loading="lazy" src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="${v.t}"
+        onerror="this.onerror=null;this.src='https://img.youtube.com/vi/${v.id}/0.jpg'">
+      <div class="yt-play"><span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></div>`;
+    frame.addEventListener('click',()=>{
+      frame.innerHTML=`<iframe src="https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0" title="${v.t}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
     });
-    </script>
+    c.appendChild(frame);
+    const body=document.createElement('div');body.className='body';
+    body.innerHTML=`<h4>${v.t}</h4><p>${v.d}</p>`;
+    c.appendChild(body);
+    yt.appendChild(c);
+  });
+
+  /* =========================================================
+     UI behaviour: nav, reveal, typed, burger
+  ==========================================================*/
+  const nav=document.getElementById('nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>40));
+
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  const burger=document.getElementById('burger'),navlinks=document.getElementById('navlinks');
+  burger.onclick=()=>navlinks.classList.toggle('open');
+  navlinks.querySelectorAll('a').forEach(a=>a.onclick=()=>navlinks.classList.remove('open'));
+
+  // typed roles
+  const roles=['Computer Vision systems','Visual SLAM','self-supervised perception','marine autonomy','robots that see.'];
+  const typed=document.getElementById('typed');let ri=0,ci=0,del=false;
+  (function type(){
+    const w=roles[ri];
+    typed.textContent=del?w.slice(0,ci--):w.slice(0,ci++);
+    if(!del&&ci===w.length+1){del=true;setTimeout(type,1400);return;}
+    if(del&&ci<0){del=false;ri=(ri+1)%roles.length;ci=0;setTimeout(type,180);return;}
+    setTimeout(type,del?38:70);
+  })();
+
+  /* =========================================================
+     MODAL
+  ==========================================================*/
+  const modal=document.getElementById('modal'),mViz=document.getElementById('modal-viz');
+  let activeAnim=null;
+  function openModal(p){
+    document.getElementById('modal-cat').textContent=p.cat;
+    document.getElementById('modal-title').textContent=p.title;
+    document.getElementById('modal-desc').textContent=p.desc;
+    document.getElementById('modal-vlabel').textContent=p.id.toUpperCase().replace(/-/g,'_');
+    document.getElementById('modal-tags').innerHTML=p.tags.map(t=>`<span class="mt">${t}</span>`).join('');
+    const lk=document.getElementById('modal-links');
+    lk.innerHTML=p.links.length?p.links.map(l=>`<a class="btn ${l.l.toLowerCase().includes('github')||l.l.toLowerCase().includes('package')?'btn-primary':'btn-ghost'}" href="${l.u}" target="_blank" rel="noopener">${l.l} ↗</a>`).join('')
+      :'<span style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--muted-2)">Individual / unpublished — no public repo</span>';
+    modal.classList.add('open');document.body.style.overflow='hidden';
+    if(window.ANIMS&&window.ANIMS[p.anim]){activeAnim=window.ANIMS[p.anim](mViz);}
+  }
+  function closeModal(){
+    modal.classList.remove('open');document.body.style.overflow='';
+    if(activeAnim){activeAnim.stop();activeAnim=null;}
+    mViz.querySelectorAll('canvas').forEach(c=>c.remove());
+  }
+  modal.querySelectorAll('[data-close]').forEach(x=>x.onclick=closeModal);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal();});
+});
+</script>
+
+<script>
+/* =========================================================
+   THREE.JS — background + hero point cloud + modal visualizers
+========================================================== */
+(function(){
+  const A={'--accent':0x6fe9c9,'--warm':0xff8a6b,'--dim':0x3fa78f};
+
+  /* ---------- background point field ---------- */
+  const bgScene=new THREE.Scene();
+  const bgCam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,1,2000);bgCam.position.z=1;
+  const bgR=new THREE.WebGLRenderer({canvas:document.getElementById('bg-canvas'),alpha:true,antialias:true});
+  bgR.setPixelRatio(Math.min(devicePixelRatio,2));bgR.setSize(innerWidth,innerHeight);
+  const v=[];for(let i=0;i<2600;i++)v.push((Math.random()-.5)*2200,(Math.random()-.5)*2200,(Math.random()-.5)*2200);
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+  const pts=new THREE.Points(g,new THREE.PointsMaterial({color:0x2c4a44,size:1.1,transparent:true,opacity:.7}));
+  bgScene.add(pts);
+  let mx=0,my=0;
+  addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth)*2-1;my=-(e.clientY/innerHeight)*2+1;});
+
+  /* ---------- hero: perception point cloud ---------- */
+  const holder=document.getElementById('hero-canvas-holder');
+  const hScene=new THREE.Scene();
+  const hCam=new THREE.PerspectiveCamera(60,holder.clientWidth/holder.clientHeight,.1,100);hCam.position.set(0,0,7);
+  const hR=new THREE.WebGLRenderer({alpha:true,antialias:true});
+  hR.setPixelRatio(Math.min(devicePixelRatio,2));hR.setSize(holder.clientWidth,holder.clientHeight);
+  holder.appendChild(hR.domElement);
+  const heroGroup=new THREE.Group();hScene.add(heroGroup);
+
+  // deformed sphere of points (a "scanned" surface)
+  const N=2400,base=new Float32Array(N*3),pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const t=Math.acos(2*Math.random()-1),ph=2*Math.PI*Math.random(),r=2.5;
+    base[i*3]=r*Math.sin(t)*Math.cos(ph);base[i*3+1]=r*Math.sin(t)*Math.sin(ph);base[i*3+2]=r*Math.cos(t);
+  }
+  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const cloud=new THREE.Points(pg,new THREE.PointsMaterial({color:A['--accent'],size:.045,transparent:true,opacity:.9}));
+  heroGroup.add(cloud);
+  // wire shell
+  const shell=new THREE.Mesh(new THREE.IcosahedronGeometry(2.85,1),new THREE.MeshBasicMaterial({color:A['--dim'],wireframe:true,transparent:true,opacity:.14}));
+  heroGroup.add(shell);
+  // scanning ring
+  const ring=new THREE.Mesh(new THREE.RingGeometry(2.9,3.0,64),new THREE.MeshBasicMaterial({color:A['--warm'],transparent:true,opacity:.5,side:THREE.DoubleSide}));
+  ring.rotation.x=Math.PI/2;heroGroup.add(ring);
+
+  function heroFrame(t){
+    for(let i=0;i<N;i++){
+      const bx=base[i*3],by=base[i*3+1],bz=base[i*3+2];
+      const n=Math.sin(bx*1.6+t*1.1)+Math.cos(by*1.7+t*.9)+Math.sin(bz*1.5+t*1.3);
+      const s=1+n*.07;
+      pos[i*3]=bx*s;pos[i*3+1]=by*s;pos[i*3+2]=bz*s;
+    }
+    pg.attributes.position.needsUpdate=true;
+    heroGroup.rotation.y=t*.18+mx*.4;heroGroup.rotation.x=my*.3;
+    shell.rotation.y=-t*.1;
+    ring.position.y=Math.sin(t*.8)*2.6;ring.material.opacity=.25+Math.abs(Math.cos(t*.8))*.4;
+  }
+
+  const clock=new THREE.Clock();
+  (function loop(){
+    requestAnimationFrame(loop);
+    const t=clock.getElapsedTime();
+    pts.rotation.y+=.0003;pts.position.set(mx*30,my*30,0);
+    bgR.render(bgScene,bgCam);
+    heroFrame(t);hR.render(hScene,hCam);
+  })();
+
+  addEventListener('resize',()=>{
+    bgCam.aspect=innerWidth/innerHeight;bgCam.updateProjectionMatrix();bgR.setSize(innerWidth,innerHeight);
+    if(holder.clientWidth){hCam.aspect=holder.clientWidth/holder.clientHeight;hCam.updateProjectionMatrix();hR.setSize(holder.clientWidth,holder.clientHeight);}
+  });
+
+  /* ---------- modal visualizer factory ---------- */
+  function makeScene(c){
+    const sc=new THREE.Scene();
+    const cam=new THREE.PerspectiveCamera(70,c.clientWidth/c.clientHeight,.1,1000);
+    const r=new THREE.WebGLRenderer({alpha:true,antialias:true});
+    r.setPixelRatio(Math.min(devicePixelRatio,2));r.setSize(c.clientWidth,c.clientHeight);r.setClearColor(0,0);
+    c.appendChild(r.domElement);
+    sc.add(new THREE.AmbientLight(0xffffff,.6));
+    const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(4,8,6);sc.add(dl);
+    let id,upd=()=>{};
+    const an=()=>{upd();r.render(sc,cam);id=requestAnimationFrame(an);};
+    const stop=()=>{if(id)cancelAnimationFrame(id);r.dispose();if(r.domElement.parentNode===c)c.removeChild(r.domElement);};
+    const ro=new ResizeObserver(()=>{if(!c.clientWidth)return;cam.aspect=c.clientWidth/c.clientHeight;cam.updateProjectionMatrix();r.setSize(c.clientWidth,c.clientHeight);});
+    ro.observe(c);
+    return {sc,cam,set:f=>upd=f,run:an,stop};
+  }
+  function label(text,w,h,size,col){
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');
+    x.font=`${size}px 'JetBrains Mono',monospace`;x.fillStyle=col||'#6fe9c9';x.textAlign='center';x.textBaseline='middle';x.fillText(text,w/2,h/2);
+    return new THREE.CanvasTexture(cv);
+  }
+
+  const ANIMS={
+    driver(c){const s=makeScene(c);s.cam.position.z=10;const grp=new THREE.Group();s.sc.add(grp);
+      grp.add(new THREE.Mesh(new THREE.BoxGeometry(5,2,2.5),new THREE.MeshStandardMaterial({color:0xbfcbc6,roughness:.5})));
+      const top=new THREE.Mesh(new THREE.BoxGeometry(3,1.5,2),new THREE.MeshStandardMaterial({color:0xbfcbc6,roughness:.5}));top.position.y=1.5;grp.add(top);
+      const icons=['📱','🗣️','☕','😴','🎶'].map((ic,i)=>{const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d');x.font='48px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(ic,32,32);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true}));sp.position.set(Math.cos(i*2*Math.PI/5)*4,2,Math.sin(i*2*Math.PI/5)*4);sp.scale.set(1.4,1.4,1.4);s.sc.add(sp);return sp;});
+      s.set(()=>{grp.rotation.y+=.006;icons.forEach(sp=>sp.position.y=2+Math.sin(Date.now()*.002+sp.position.x)*.5);});s.run();return s;},
+    defect(c){const s=makeScene(c);s.cam.position.z=8;const sh=new THREE.Shape();sh.moveTo(0,0);sh.lineTo(0,4);sh.lineTo(1,4);sh.lineTo(1,2);sh.lineTo(3,2);sh.lineTo(3,4);sh.lineTo(4,4);sh.lineTo(4,0);sh.lineTo(0,0);
+      const ge=new THREE.ExtrudeGeometry(sh,{depth:1,bevelEnabled:false});ge.center();
+      const part=new THREE.Mesh(ge,new THREE.MeshStandardMaterial({color:0x8899aa,metalness:.8,roughness:.4}));s.sc.add(part);
+      const def=new THREE.Mesh(new THREE.SphereGeometry(.3,16,16),new THREE.MeshPhongMaterial({color:A['--warm'],emissive:A['--warm'],emissiveIntensity:1,transparent:true}));def.position.set(1.5,0,.55);part.add(def);
+      s.set(()=>{part.rotation.x+=.005;part.rotation.y+=.008;def.material.opacity=(Math.sin(Date.now()*.005)+1)*.3+.4;});s.run();return s;},
+    caption(c){const s=makeScene(c);s.cam.position.z=12;s.sc.add(new THREE.Mesh(new THREE.PlaneGeometry(16,9),new THREE.MeshBasicMaterial({color:0x0a1614})));
+      const box=new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(3,3,3)),A['--accent']);s.sc.add(box);
+      const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:label('object 0.98',256,64,30),transparent:true}));tag.scale.set(4,1,1);s.sc.add(tag);
+      let t=0;s.set(()=>{t+=.02;const x=Math.sin(t)*4,y=Math.cos(t*.7)*2;box.position.set(x,y,0);tag.position.set(x,y+2,0);});s.run();return s;},
+    emotion(c){const s=makeScene(c);s.cam.position.z=10;
+      const head=new THREE.Line(new THREE.CircleGeometry(3,48),new THREE.LineBasicMaterial({color:A['--accent']}));s.sc.add(head);
+      const el=new THREE.Line(new THREE.CircleGeometry(.3,16),new THREE.LineBasicMaterial({color:A['--accent']}));el.position.set(-1,1,0);s.sc.add(el);
+      const er=el.clone();er.position.x=1;s.sc.add(er);
+      const mouth=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1,-1,0),new THREE.Vector3(1,-1,0)]),new THREE.LineBasicMaterial({color:A['--warm']}));s.sc.add(mouth);
+      const moods=[[-1,-1.2,0,-0.8,1,-1.2],[-1,-.8,0,-1.2,1,-.8],[-1,-1,1,-1]];let mi=0;
+      const iv=setInterval(()=>{mi=(mi+1)%3;const m=moods[mi];const p=[];for(let i=0;i<m.length;i+=2)p.push(new THREE.Vector3(m[i],m[i+1],0));mouth.geometry.setFromPoints(p);},1600);
+      s.set(()=>{head.rotation.z+=.002;});s.run();const o=s.stop;s.stop=()=>{clearInterval(iv);o();};return s;},
+    currency(c){const s=makeScene(c);s.cam.position.z=10;
+      const note=new THREE.Mesh(new THREE.PlaneGeometry(8,3.5),new THREE.MeshBasicMaterial({color:0x16302a}));note.position.y=1;s.sc.add(note);
+      const txt=new THREE.Sprite(new THREE.SpriteMaterial({map:label('$ BANKNOTE',512,128,40,'#9fd9cc'),transparent:true}));txt.scale.set(6,1.5,1);txt.position.y=1;s.sc.add(txt);
+      const scan=new THREE.Mesh(new THREE.PlaneGeometry(9,.18),new THREE.MeshBasicMaterial({color:A['--accent'],transparent:true,opacity:.8}));scan.position.z=.1;s.sc.add(scan);
+      const ok=new THREE.Sprite(new THREE.SpriteMaterial({map:label('✓ VERIFIED',512,128,46,'#6fe9c9'),transparent:true}));ok.scale.set(5,1.3,1);ok.position.y=-2.2;ok.material.opacity=0;s.sc.add(ok);
+      let p=0;s.set(()=>{p=(p+.01)%1;scan.position.y=2.6-p*3;ok.material.opacity=p>.92?1:0;note.rotation.y+=.002;txt.material.rotation;});s.run();return s;},
+    ev(c){const s=makeScene(c);s.cam.position.set(0,15,15);s.cam.lookAt(0,0,0);s.sc.add(new THREE.GridHelper(20,20,A['--accent'],0x223833));
+      const bg=new THREE.BoxGeometry(1,1,1);for(let i=0;i<50;i++){const b=new THREE.Mesh(bg,new THREE.MeshStandardMaterial({color:0x223344,roughness:.8}));b.position.set((Math.random()-.5)*20,Math.random()*2+.5,(Math.random()-.5)*20);b.scale.y=Math.random()*4+1;s.sc.add(b);}
+      const sg=new THREE.CylinderGeometry(.2,.2,1.5,16),sm=new THREE.MeshPhongMaterial({color:A['--accent'],emissive:A['--accent'],emissiveIntensity:1});
+      for(let i=0;i<5;i++){const st=new THREE.Mesh(sg,sm);st.position.set((Math.random()-.5)*15,.75,(Math.random()-.5)*15);s.sc.add(st);}
+      s.set(()=>{s.sc.rotation.y+=.0025;});s.run();return s;},
+    gameplay(c){const s=makeScene(c);s.cam.position.z=8;const grp=new THREE.Group();s.sc.add(grp);
+      const gh=new THREE.GridHelper(6,3,A['--accent'],A['--accent']);gh.rotation.x=Math.PI/2;grp.add(gh);
+      const mv=[[-2,2,0,'X'],[0,2,0,'O'],[2,0,0,'X'],[0,0,0,'O']];
+      mv.forEach((m,i)=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:label(m[3],64,64,48,m[3]==='X'?'#ff8a6b':'#6fe9c9'),transparent:true}));sp.scale.set(1.4,1.4,1);sp.position.set(m[0],m[1],m[2]);sp.material.opacity=0;grp.add(sp);setTimeout(()=>{sp.material.opacity=1;},i*700);});
+      s.set(()=>{grp.rotation.z+=.004;});s.run();return s;},
+    filter(c){const s=makeScene(c);s.cam.position.z=15;const ps=[];
+      for(let i=0;i<260;i++){const indian=Math.random()>.5;const pt=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),new THREE.MeshBasicMaterial({color:indian?A['--accent']:A['--warm']}));pt.position.set((Math.random()-.5)*20,10,(Math.random()-.5)*8);pt.userData={indian};ps.push(pt);s.sc.add(pt);}
+      const plane=new THREE.Mesh(new THREE.PlaneGeometry(25,4),new THREE.MeshBasicMaterial({color:A['--accent'],transparent:true,opacity:.15,side:THREE.DoubleSide}));plane.rotation.x=Math.PI/4;s.sc.add(plane);
+      s.set(()=>{ps.forEach(p=>{p.position.y-=.06;if(p.position.y<-10)p.position.y=10;const inZone=p.position.y<1.5&&p.position.y>-1.5;p.material.color.set(inZone?(p.userData.indian?A['--accent']:0x33514a):(p.userData.indian?A['--accent']:A['--warm']));});});s.run();return s;},
+    voice(c){const s=makeScene(c);s.cam.position.z=5;const grp=new THREE.Group();s.sc.add(grp);
+      const ico=new THREE.IcosahedronGeometry(1.5,1);grp.add(new THREE.LineSegments(new THREE.WireframeGeometry(ico),new THREE.LineBasicMaterial({color:A['--accent'],transparent:true,opacity:.8})));
+      const pgm=new THREE.BufferGeometry();pgm.setAttribute('position',new THREE.BufferAttribute(ico.attributes.position.array.slice(),3));grp.add(new THREE.Points(pgm,new THREE.PointsMaterial({color:A['--accent'],size:.08})));
+      s.set(()=>{grp.rotation.y+=.004;const a=(Math.sin(Date.now()*.005)+1)/2,sc=1+a*.22;grp.scale.set(sc,sc,sc);});s.run();return s;},
+    ner(c){const s=makeScene(c);s.cam.position.z=10;const words=['Sharvesh','went','to','Chennai'],col=['#6fe9c9','#cfe0db','#cfe0db','#ff8a6b'];let cx=-6;
+      words.forEach((w,i)=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:label(w,256,64,34,col[i]),transparent:true}));sp.scale.set(w.length*.55,1.1,1);sp.position.x=cx+w.length*.275;cx+=w.length*.55+.5;s.sc.add(sp);});
+      s.set(()=>{s.sc.rotation.y+=.005;});s.run();return s;},
+    qa(c){const s=makeScene(c);s.cam.position.z=12;
+      const q=new THREE.Sprite(new THREE.SpriteMaterial({map:label('Q: What is BERT?',512,96,30,'#cfe0db'),transparent:true}));q.scale.set(8,1.5,1);q.position.y=2;s.sc.add(q);
+      const a=new THREE.Sprite(new THREE.SpriteMaterial({map:label('A: A Transformer model',512,96,28,'#6fe9c9'),transparent:true}));a.scale.set(8,1.5,1);a.position.y=-2;a.material.opacity=0;s.sc.add(a);
+      let t=0;s.set(()=>{t+=.01;a.material.opacity=t>1.2?Math.min(1,(t-1.2)):0;});s.run();return s;},
+    sentiment(c){const s=makeScene(c);s.cam.position.z=10;const data=[['😄 Loved it!','#6fe9c9'],['😠 Very bad','#ff8a6b'],['🤔 Okay I guess','#cfe0db']];
+      const sps=data.map((d,i)=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:label(d[0],512,96,32,d[1]),transparent:true}));sp.scale.set(7,1.4,1);sp.position.set((i-1)*9,Math.random()*3-1.5,0);s.sc.add(sp);return sp;});
+      s.set(()=>{sps.forEach(sp=>{sp.position.x-=.02;if(sp.position.x<-14)sp.position.x=14;});});s.run();return s;},
+
+    // ---- new project visualizers ----
+    drone(c){const s=makeScene(c);s.cam.position.set(0,4,9);s.cam.lookAt(0,0,0);
+      s.sc.add(new THREE.GridHelper(24,24,0x22433c,0x16302a));
+      const drone=new THREE.Group();s.sc.add(drone);
+      drone.add(new THREE.Mesh(new THREE.BoxGeometry(.8,.25,.8),new THREE.MeshStandardMaterial({color:0x9fd9cc,metalness:.6,roughness:.3})));
+      [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(a=>{const arm=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,1.4,8),new THREE.MeshStandardMaterial({color:0x3fa78f}));arm.rotation.z=Math.PI/2;arm.rotation.y=Math.atan2(a[1],a[0]);drone.add(arm);const rotor=new THREE.Mesh(new THREE.TorusGeometry(.34,.04,8,20),new THREE.MeshBasicMaterial({color:A['--accent']}));rotor.position.set(a[0]*.75,.12,a[1]*.75);rotor.rotation.x=Math.PI/2;drone.add(rotor);});
+      // SLAM point trail + feature points
+      const trail=[],tg=new THREE.BufferGeometry(),tl=[];
+      const feat=new THREE.Group();s.sc.add(feat);
+      for(let i=0;i<120;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.03,6,6),new THREE.MeshBasicMaterial({color:A['--warm']}));m.position.set((Math.random()-.5)*18,Math.random()*3-.5,(Math.random()-.5)*18);feat.add(m);}
+      const line=new THREE.Line(tg,new THREE.LineBasicMaterial({color:A['--accent']}));s.sc.add(line);
+      let t=0;s.set(()=>{t+=.012;const x=Math.cos(t)*5,z=Math.sin(t*1.3)*4;drone.position.set(x,1.6+Math.sin(t*2)*.15,z);drone.rotation.y=-t*1.3;
+        drone.children.forEach(ch=>{if(ch.geometry&&ch.geometry.type==='TorusGeometry')ch.rotation.z+=.6;});
+        tl.push(x,1.6,z);if(tl.length>270)tl.splice(0,3);tg.setAttribute('position',new THREE.Float32BufferAttribute(tl,3));
+        feat.rotation.y+=.001;});s.run();return s;},
+    agents(c){const s=makeScene(c);s.cam.position.z=8;const grp=new THREE.Group();s.sc.add(grp);
+      // central document
+      const doc=new THREE.Mesh(new THREE.BoxGeometry(1.6,2.1,.1),new THREE.MeshStandardMaterial({color:0x16302a,emissive:0x0c1a17}));grp.add(doc);
+      for(let i=0;i<5;i++){const ln=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.08),new THREE.MeshBasicMaterial({color:0x3fa78f}));ln.position.set(0,.6-i*.3,.06);grp.add(ln);}
+      const agents=[],links=[];
+      for(let i=0;i<6;i++){const node=new THREE.Mesh(new THREE.IcosahedronGeometry(.32,0),new THREE.MeshStandardMaterial({color:A['--accent'],emissive:A['--accent'],emissiveIntensity:.4,flatShading:true}));node.userData={a:i*Math.PI*2/6,r:3.2};grp.add(node);agents.push(node);
+        const lg=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);const ll=new THREE.Line(lg,new THREE.LineBasicMaterial({color:A['--accent'],transparent:true,opacity:.3}));grp.add(ll);links.push(ll);}
+      let t=0;s.set(()=>{t+=.01;grp.rotation.y+=.003;agents.forEach((n,i)=>{const a=n.userData.a+t;n.position.set(Math.cos(a)*n.userData.r,Math.sin(a*1.3)*1.4,Math.sin(a)*n.userData.r);links[i].geometry.setFromPoints([new THREE.Vector3(),n.position.clone()]);});});s.run();return s;},
+    graph(c){const s=makeScene(c);s.cam.position.z=9;const grp=new THREE.Group();s.sc.add(grp);
+      const nodes=[],pcount=26,positions=[];
+      for(let i=0;i<pcount;i++){const p=new THREE.Vector3((Math.random()-.5)*8,(Math.random()-.5)*6,(Math.random()-.5)*5);positions.push(p);const big=i<5;const m=new THREE.Mesh(new THREE.SphereGeometry(big?.22:.11,12,12),new THREE.MeshStandardMaterial({color:big?A['--warm']:A['--accent'],emissive:big?A['--warm']:A['--accent'],emissiveIntensity:.5}));m.position.copy(p);grp.add(m);nodes.push(m);}
+      for(let i=0;i<pcount;i++)for(let j=i+1;j<pcount;j++){if(positions[i].distanceTo(positions[j])<2.6){const lg=new THREE.BufferGeometry().setFromPoints([positions[i],positions[j]]);grp.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:A['--dim'],transparent:true,opacity:.35})));}}
+      let t=0;s.set(()=>{t+=.01;grp.rotation.y+=.004;grp.rotation.x=Math.sin(t*.3)*.18;nodes.forEach((n,i)=>{n.scale.setScalar(1+Math.sin(t*2+i)*.12);});});s.run();return s;},
+    eeg(c){const s=makeScene(c);s.cam.position.z=8;
+      // recurrence-plot grid
+      const grid=new THREE.Group();s.sc.add(grid);const G=16,cell=.34;
+      const mats=[];for(let i=0;i<G;i++)for(let j=0;j<G;j++){const m=new THREE.Mesh(new THREE.PlaneGeometry(cell*.86,cell*.86),new THREE.MeshBasicMaterial({color:A['--accent'],transparent:true,opacity:.1}));m.position.set((i-G/2)*cell,(j-G/2)*cell,-1.4);m.userData={i,j};grid.add(m);mats.push(m);}
+      // waveform
+      const wpts=[];for(let i=0;i<80;i++)wpts.push(new THREE.Vector3((i/80-.5)*6,0,1));const wg=new THREE.BufferGeometry().setFromPoints(wpts);const wave=new THREE.Line(wg,new THREE.LineBasicMaterial({color:A['--warm']}));wave.position.y=2.4;s.sc.add(wave);
+      let t=0;s.set(()=>{t+=.04;
+        for(let k=0;k<80;k++){wpts[k].y=2.4*0+Math.sin(k*.4+t)*.4+Math.sin(k*.13+t*1.7)*.3;}
+        wg.setAttribute('position',new THREE.Float32BufferAttribute(wpts.flatMap(p=>[p.x,p.y+2.4,p.z]),3));
+        mats.forEach(m=>{const v=(Math.sin(m.userData.i*.7+t)+Math.cos(m.userData.j*.7+t))*.5;m.material.opacity=.08+Math.abs(v)*.6;});
+      });s.run();return s;},
+  };
+  window.ANIMS=ANIMS;
+})();
+</script>
 </body>
 </html>
-
