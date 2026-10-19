@@ -223,7 +223,12 @@
   .pub .venue{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-dim);margin-top:10px;letter-spacing:.02em}
   .pill{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap;border:1px solid var(--line)}
   .pill.review{color:var(--warm);border-color:rgba(255,138,107,.4)}
-  .pill.pub{color:var(--accent);border-color:rgba(111,233,201,.4)}
+  .pill.published{color:var(--accent);border-color:rgba(111,233,201,.4)}
+  .pub h4 a{color:inherit;text-decoration:none;border-bottom:1px solid var(--accent-dim);transition:color .25s,border-color .25s}
+  .pub h4 a:hover{color:var(--accent);border-color:var(--accent)}
+  .pub .doi{color:var(--accent);text-decoration:none}
+  .pub .doi:hover{text-decoration:underline}
+  .profile-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
   @media(max-width:760px){.pub{grid-template-columns:1fr;gap:8px}.pub .pn{display:none}}
 
   /* ---------- honours + leadership ---------- */
@@ -328,6 +333,7 @@
         <a href="#publications">/research</a>
         <a href="#skills">/stack</a>
         <a href="#youtube">/My_youtube_Lecture_series</a>
+        <a href="https://scholar.google.com/citations?hl=en&amp;user=DD9hnEYAAAAJ" target="_blank" rel="noopener">/scholar</a>
         <a href="#contact" class="nav-cta">Get in touch</a>
       </div>
     </div>
@@ -350,6 +356,8 @@
           <div class="socials">
             <a href="https://www.linkedin.com/in/sharveshsubhash/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
             <a href="https://github.com/SharveshSubhash" target="_blank" rel="noopener" aria-label="GitHub"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+            <a href="https://scholar.google.com/citations?hl=en&amp;user=DD9hnEYAAAAJ" target="_blank" rel="noopener" aria-label="Google Scholar" title="Google Scholar"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg></a>
+            <a href="https://www.researchgate.net/profile/Sharvesh-Subhash-2/research" target="_blank" rel="noopener" aria-label="ResearchGate" title="ResearchGate"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="currentColor">RG</text></svg></a>
             <a href="mailto:cod.sharvesh2002@gmail.com" aria-label="Email"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
           </div>
         </div>
@@ -427,6 +435,10 @@
         <p class="sec-note">Peer-reviewed and in-review work across medical CV, autonomy and conversational AI.</p>
       </div>
       <div class="reveal" id="pubs"></div>
+      <div class="profile-links reveal">
+        <a class="btn btn-primary" href="https://scholar.google.com/citations?hl=en&amp;user=DD9hnEYAAAAJ" target="_blank" rel="noopener">Google Scholar ↗</a>
+        <a class="btn btn-ghost" href="https://www.researchgate.net/profile/Sharvesh-Subhash-2/research" target="_blank" rel="noopener">ResearchGate ↗</a>
+      </div>
     </section>
 
     <!-- HONOURS + LEADERSHIP -->
@@ -485,6 +497,8 @@
           <span style="padding-left:26px;color:var(--muted-2)">+91 75488 90774</span>
           <a href="https://www.linkedin.com/in/sharveshsubhash/" target="_blank" rel="noopener"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>linkedin.com/in/sharveshsubhash</a>
           <a href="https://github.com/SharveshSubhash" target="_blank" rel="noopener"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>github.com/SharveshSubhash</a>
+          <a href="https://scholar.google.com/citations?hl=en&amp;user=DD9hnEYAAAAJ" target="_blank" rel="noopener"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/></svg>Google Scholar</a>
+          <a href="https://www.researchgate.net/profile/Sharvesh-Subhash-2/research" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24"><rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><text x="12" y="16.2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="currentColor">RG</text></svg>ResearchGate</a>
         </div>
       </div>
       <div class="foot-bottom">
@@ -631,9 +645,10 @@ document.addEventListener('DOMContentLoaded', function(){
   ];
 
   const publications=[
-    {title:'A Novel AI Model for Endolaparoscopic TEP Inguinal Hernia Repair',
+    {title:'A novel artificial intelligence anatomical model for landmark recognition in endolaparoscopic totally extraperitoneal inguinal hernia repair',
      meta:'Second author with NUS Medicine surgeons. Developed a state-of-the-art segmentation-based computer-vision model to identify tissues and organs in laparoscopic surgical video.',
-     venue:'British Journal of Surgery · Oxford University Press',status:'In Review'},
+     venue:'Surgical Endoscopy · Springer · 2026',status:'Published',
+     doi:'10.1007/s00464-026-13359-3'},
     {title:'Self-Driving Cars to Drive Autonomously using Deep Learning',
      meta:'Trained a CNN–RNN model on simulated car-game data to give autonomous navigation capability to a toy car.',
      venue:'IJARESM',status:'Published'},
@@ -734,9 +749,10 @@ document.addEventListener('DOMContentLoaded', function(){
   const pubs=document.getElementById('pubs');
   publications.forEach((p,i)=>{
     const el=document.createElement('div');el.className='pub';
-    const cls=p.status==='Published'?'pub':'review';
+    const cls=p.status==='Published'?'published':'review';
+    const doiUrl=p.doi?`https://doi.org/${p.doi}`:'';
     el.innerHTML=`<div class="pn">P${String(i+1).padStart(2,'0')}</div>
-      <div><h4>${p.title}</h4><p class="meta">${p.meta}</p><div class="venue">↳ ${p.venue}</div></div>
+      <div><h4>${doiUrl?`<a href="${doiUrl}" target="_blank" rel="noopener">${p.title} ↗</a>`:p.title}</h4><p class="meta">${p.meta}</p><div class="venue">↳ ${p.venue}${doiUrl?` · DOI: <a class="doi" href="${doiUrl}" target="_blank" rel="noopener">${p.doi}</a>`:''}</div></div>
       <div class="pill ${cls}">${p.status}</div>`;
     pubs.appendChild(el);
   });
